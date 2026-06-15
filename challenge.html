@@ -244,8 +244,8 @@
     <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- Load MindAR from unpkg (more reliable) -->
-    <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+    <!-- Load MindAR from jsDelivr (UMD bundle) -->
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
     
     <!-- Debug: Check if libraries loaded -->
     <script>
@@ -303,7 +303,7 @@
         // Challenge Data
         const Challenges = {
             ransomware: {
-                name: "Ransomware Response V2",
+                name: "Ransomware Response V3",
                 questions: [
                     {
                         text: "Critical: Systems encrypted, ransom note displayed. First action?",
