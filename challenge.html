@@ -241,9 +241,18 @@
         <div id="debug-console"></div>
     </div>
 
-    <!-- Load from local vendor folder (RELIABLE) -->
+    <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Load MindAR from CDN with fallback -->
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
+    
+    <!-- Debug: Check if libraries loaded -->
+    <script>
+        console.log('Three.js loaded:', typeof THREE !== 'undefined');
+        console.log('MindAR loaded:', typeof MindARThree !== 'undefined');
+        console.log('Window objects:', Object.keys(window).filter(k => k.includes('Mind') || k.includes('AR')));
+    </script>
 
     <script>
         // Logging System
@@ -292,7 +301,7 @@
         // Challenge Data
         const Challenges = {
             ransomware: {
-                name: "Ransomware Response",
+                name: "Ransomware Response V1",
                 questions: [
                     {
                         text: "Critical: Systems encrypted, ransom note displayed. First action?",
