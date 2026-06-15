@@ -244,18 +244,15 @@
     <!-- Load Three.js from CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- Load MindAR as ES Module -->
-    <script type="module">
-        import { MindARThree } from 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/+esm';
-        window.MindARThree = MindARThree;
-        console.log('MindAR loaded via ES module');
-    </script>
+    <!-- Load MindAR from unpkg (more reliable) -->
+    <script src="https://unpkg.com/mind-ar@1.2.5/dist/mindar-image-three.prod.js"></script>
     
     <!-- Debug: Check if libraries loaded -->
     <script>
         setTimeout(() => {
             console.log('Three.js loaded:', typeof THREE !== 'undefined');
             console.log('MindAR loaded:', typeof MindARThree !== 'undefined');
+            console.log('MindAR object:', window.MindARThree);
         }, 1000);
     </script>
 
