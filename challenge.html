@@ -241,18 +241,34 @@
         <div id="debug-console"></div>
     </div>
 
-    <!-- Load from local vendor folder (uploaded to GitHub) -->
-    <script src="vendor/three.min.js"></script>
+    <!-- Import Map untuk resolve "three" module -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/": "https://cdn.jsdelivr.net/npm/three@0.160.0/"
+      }
+    }
+    </script>
+
+    <!-- Load MindAR sebagai ES Module dengan dependency resolved -->
     <script type="module">
-        import { MindARThree } from './vendor/mindar-image-three.prod.js';
-        window.MindARThree = MindARThree;
+      import { MindARThree } from 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js';
+      import * as THREE from 'three';
+      
+      // Expose kepada global scope untuk kod legacy
+      window.MindARThree = MindARThree;
+      window.THREE = THREE;
+      window.MindARReady = true;
+      
+      console.log('MindAR loaded via ES Module');
     </script>
     
     <!-- Debug: Check if libraries loaded -->
     <script>
         setTimeout(() => {
-            console.log('Three.js loaded:', typeof THREE !== 'undefined');
-            console.log('MindAR loaded:', typeof MindARThree !== 'undefined');
+            console.log('Three.js loaded:', typeof window.THREE !== 'undefined');
+            console.log('MindAR loaded:', typeof window.MindARThree !== 'undefined');
             console.log('MindAR object:', window.MindARThree);
         }, 1000);
     </script>
@@ -432,15 +448,15 @@
             }
             
             // 3. Check Libraries
-            if (typeof THREE === 'undefined') {
+            if (typeof window.THREE === 'undefined') {
                 Logger.error('Three.js not loaded');
                 updateStatus('❌', 'Library Error', 'Failed to load Three.js. Check internet connection.');
                 return false;
             }
             
-            if (typeof MindARThree === 'undefined') {
+            if (typeof window.MindARThree === 'undefined') {
                 Logger.error('MindAR not loaded');
-                updateStatus('❌', 'Library Error', 'Failed to load MindAR. Check vendor/ folder.');
+                updateStatus('❌', 'Library Error', 'Failed to load MindAR. Check console for errors.');
                 return false;
             }
             
