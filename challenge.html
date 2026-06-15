@@ -243,7 +243,10 @@
 
     <!-- Load from local vendor folder (uploaded to GitHub) -->
     <script src="vendor/three.min.js"></script>
-    <script src="vendor/mindar-image-three.prod.js"></script>
+    <script type="module">
+        import { MindARThree } from './vendor/mindar-image-three.prod.js';
+        window.MindARThree = MindARThree;
+    </script>
     
     <!-- Debug: Check if libraries loaded -->
     <script>
