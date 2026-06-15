@@ -246,31 +246,41 @@
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-        "three/": "https://cdn.jsdelivr.net/npm/three@0.160.0/"
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
       }
     }
     </script>
 
     <!-- Load MindAR sebagai ES Module dengan dependency resolved -->
     <script type="module">
-      import { MindARThree } from 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js';
       import * as THREE from 'three';
+      import { MindARThree } from 'https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-three.prod.js';
       
       // Expose kepada global scope untuk kod legacy
-      window.MindARThree = MindARThree;
       window.THREE = THREE;
-      window.MindARReady = true;
+      window.MindARThree = MindARThree;
       
-      console.log('MindAR loaded via ES Module');
+      console.log('Module loaded successfully');
     </script>
     
     <!-- Debug: Check if libraries loaded -->
     <script>
-        setTimeout(() => {
-            console.log('Three.js loaded:', typeof window.THREE !== 'undefined');
-            console.log('MindAR loaded:', typeof window.MindARThree !== 'undefined');
-            console.log('MindAR object:', window.MindARThree);
-        }, 1000);
+      // Check dengan lebih frequent polling
+      let checkCount = 0;
+      function waitForLibs() {
+        checkCount++;
+        if (window.THREE && window.MindARThree) {
+          console.log('Three.js loaded:', true);
+          console.log('MindAR loaded:', true);
+          console.log('MindAR object:', window.MindARThree);
+        } else if (checkCount < 20) { // Check 10 saat max
+          console.log('Waiting for libs... attempt', checkCount);
+          setTimeout(waitForLibs, 500);
+        } else {
+          console.error('Timeout waiting for libraries');
+        }
+      }
+      setTimeout(waitForLibs, 100);
     </script>
 
     <script>
