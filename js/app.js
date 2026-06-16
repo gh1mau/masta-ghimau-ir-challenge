@@ -27,6 +27,7 @@ class IRChallengeApp {
         this.currentQuestionIndex = 0;
         this.score = 0;
         this.playerName = '';
+        this.initialized = false;
 
         // Scenario registry
         this.scenarios = {
@@ -40,36 +41,51 @@ class IRChallengeApp {
     }
 
     async init() {
-        logger.info('Initializing IR Challenge App v' + CONFIG.app.version);
+        try {
+            logger.info('Initializing IR Challenge App v' + CONFIG.app.version);
 
-        // Initialize UI Manager
-        uiManager.init();
+            // Initialize UI Manager first
+            uiManager.init();
+            this.initialized = true;
 
-        // Check environment
-        this.checkEnvironment();
+            // Check environment
+            if (!this.checkEnvironment()) {
+                return;
+            }
 
-        // Get player name
-        this.playerName = this.getPlayerName();
-        if (!this.playerName) {
-            uiManager.showError('Name Required', 'Please enter your name to continue.');
-            return;
+            // Get player name
+            this.playerName = this.getPlayerName();
+
+            // Get scenario from URL
+            const scenarioType = this.getScenarioFromURL();
+            if (!scenarioType || !isValidScenario(scenarioType)) {
+                uiManager.showError('Invalid Scenario', 'Please select a valid scenario from the main menu.', [
+                    { text: 'Go to Menu', action: () => window.location.href = 'index.html' }
+                ]);
+                return;
+            }
+
+            // Load scenario
+            this.loadScenario(scenarioType);
+
+            // Initialize AR
+            await this.initAR();
+
+        } catch (error) {
+            logger.error('App initialization failed', { error: error.message, stack: error.stack });
+            uiManager.showError(
+                'Initialization Error',
+                'Failed to start: ' + error.message,
+                [
+                    { text: 'Reload', action: () => location.reload() },
+                    { text: 'Go Back', class: 'btn-secondary', action: () => window.location.href = 'index.html' }
+                ]
+            );
         }
-
-        // Get scenario from URL
-        const scenarioType = this.getScenarioFromURL();
-        if (!scenarioType || !isValidScenario(scenarioType)) {
-            uiManager.showError('Invalid Scenario', 'Please select a valid scenario from the main menu.');
-            return;
-        }
-
-        // Load scenario
-        this.loadScenario(scenarioType);
-
-        // Initialize AR
-        await this.initAR();
     }
 
     checkEnvironment() {
+        // Check HTTPS
         if (requiresHTTPS()) {
             uiManager.showWarning(
                 'HTTPS Required',
@@ -79,10 +95,12 @@ class IRChallengeApp {
             return false;
         }
 
+        // Check Camera API
         if (!hasCameraAPI()) {
             uiManager.showError(
                 'Camera Not Available',
-                'Your browser does not support camera access.'
+                'Your browser does not support camera access.',
+                [{ text: 'Go Back', action: () => window.location.href = 'index.html' }]
             );
             return false;
         }
@@ -92,7 +110,7 @@ class IRChallengeApp {
 
     getPlayerName() {
         const urlParams = new URLSearchParams(window.location.search);
-        const name = urlParams.get('name');
+        const name = urlParams.get('name') || urlParams.get('player');
         return name ? sanitizeInput(name) : 'Player';
     }
 
@@ -105,6 +123,7 @@ class IRChallengeApp {
         const ScenarioClass = this.scenarios[scenarioType];
         if (!ScenarioClass) {
             logger.error('Unknown scenario type', { scenario: scenarioType });
+            uiManager.showError('Error', 'Unknown scenario: ' + scenarioType);
             return;
         }
 
@@ -120,36 +139,61 @@ class IRChallengeApp {
     }
 
     async initAR() {
-        uiManager.updateStatus('📷', 'Initializing Camera', 'Please allow camera access...');
+        uiManager.updateStatus('📷', 'Initializing Camera', 'Please allow camera access when prompted...');
 
-        this.arEngine = new AREngine();
+        try {
+            this.arEngine = new AREngine();
 
-        const success = await this.arEngine.init(CONFIG.ar.targetPath);
-        if (!success) {
+            const success = await this.arEngine.init(CONFIG.ar.targetPath);
+            if (!success) {
+                throw new Error('AR Engine initialization failed');
+            }
+
+            // Set up AR event handlers
+            this.arEngine.onTargetFound = () => {
+                logger.ar('Target found');
+                this.onTargetFound();
+            };
+
+            this.arEngine.onTargetLost = () => {
+                logger.ar('Target lost');
+                this.onTargetLost();
+            };
+
+            // Start AR
+            await this.arEngine.start();
+
+            uiManager.hideStatus();
+            uiManager.setTrackingStatus('scanning');
+
+        } catch (error) {
+            logger.error('AR initialization failed', { error: error.message });
             uiManager.showError(
                 'AR Initialization Failed',
-                'Could not initialize AR. Please check camera permissions.',
-                [{ text: 'Retry', action: () => this.initAR() }]
+                error.message + '\n\nYou can still play in Quiz Mode without AR.',
+                [
+                    { text: 'Start Quiz Mode', action: () => this.startQuizMode() },
+                    { text: 'Retry', class: 'btn-secondary', action: () => this.initAR() }
+                ]
             );
-            return;
         }
+    }
 
-        // Set up AR event handlers
-        this.arEngine.onTargetFound = () => {
-            logger.ar('Target found');
-            this.onTargetFound();
-        };
+    startQuizMode() {
+        logger.info('Starting Quiz Mode (No AR)');
 
-        this.arEngine.onTargetLost = () => {
-            logger.ar('Target lost');
-            this.onTargetLost();
-        };
-
-        // Start AR
-        await this.arEngine.start();
+        // Clear AR container
+        const container = document.getElementById('ar-container');
+        if (container) {
+            container.innerHTML = '';
+            container.style.background = 'linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)';
+        }
 
         uiManager.hideStatus();
         uiManager.setTrackingStatus('scanning');
+
+        // Show first question directly
+        this.showCurrentQuestion();
     }
 
     onTargetFound() {
@@ -158,9 +202,13 @@ class IRChallengeApp {
         // Add AR content for current scenario
         if (this.arEngine && this.currentScenario) {
             const scenarioType = stateManager.get('scenario');
-            const content = this.arEngine.createARContent(scenarioType);
-            if (this.arEngine.anchor) {
-                this.arEngine.anchor.group.add(content);
+            try {
+                const content = this.arEngine.createARContent(scenarioType);
+                if (this.arEngine.anchor) {
+                    this.arEngine.anchor.group.add(content);
+                }
+            } catch (error) {
+                logger.error('Failed to create AR content', { error: error.message });
             }
         }
 
@@ -174,7 +222,10 @@ class IRChallengeApp {
     }
 
     showCurrentQuestion() {
-        if (!this.currentScenario) return;
+        if (!this.currentScenario) {
+            logger.error('No scenario loaded');
+            return;
+        }
 
         const question = this.currentScenario.getQuestion(this.currentQuestionIndex);
         if (!question) {
@@ -200,6 +251,9 @@ class IRChallengeApp {
         if (result.correct) {
             this.score += CONFIG.scoring.correctAnswer;
             stateManager.set('score', this.score);
+            logger.info('Correct answer', { score: this.score });
+        } else {
+            logger.warn('Wrong answer');
         }
 
         // Move to next question after delay
@@ -225,13 +279,25 @@ class IRChallengeApp {
 
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    const app = new IRChallengeApp();
-    app.init();
+    try {
+        const app = new IRChallengeApp();
+        app.init();
 
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        app.dispose();
-    });
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            app.dispose();
+        });
+    } catch (error) {
+        console.error('Failed to initialize app:', error);
+        // Show error on page
+        const statusPanel = document.getElementById('status-panel');
+        if (statusPanel) {
+            const title = document.getElementById('status-title');
+            const message = document.getElementById('status-message');
+            if (title) title.textContent = 'Error';
+            if (message) message.textContent = 'Failed to load application. Please check console for details.';
+        }
+    }
 });
 
 export { IRChallengeApp };
