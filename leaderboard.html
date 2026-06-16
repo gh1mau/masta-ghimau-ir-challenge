@@ -471,7 +471,7 @@
                     </div>
                     <div class="debug-row">
                         <span class="debug-label">Auto-refresh:</span>
-                        <span class="debug-value" id="debug-autorefresh">Enabled (5s)</span>
+                        <span class="debug-value" id="debug-autorefresh">Enabled (1s)</span>
                     </div>
                 </div>
                 <div class="debug-log" id="debug-log">
@@ -606,12 +606,12 @@
                 document.getElementById('debug-firebase').textContent = 'Error';
             });
             
-            // Auto-refresh backup (every 5 seconds)
+            // Auto-refresh backup (every 1 second for near real-time)
             autoRefreshInterval = setInterval(() => {
                 refreshData();
-            }, 5000);
+            }, 1000);
             
-            log('✓ Auto-refresh enabled (5s interval)', 'success');
+            log('✓ Auto-refresh enabled (1s interval)', 'success');
         }
         
         // Manual refresh function
