@@ -16,7 +16,7 @@ export const CONFIG = {
 
     // AR Settings
     ar: {
-        targetPath: './assets/targets/targets.mind',
+        targetPath: './targets.mind',
         maxTrack: 1,
         uiLoading: 'no',
         uiScanning: 'no',
