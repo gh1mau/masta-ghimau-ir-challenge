@@ -818,60 +818,16 @@
             alert(`${currentScenario.title}\n\nKey Points:\n• Severity: ${currentScenario.severity}\n• Actor: ${currentScenario.actor}\n• Questions: ${currentScenario.questions}`);
         }
         
+        // Firebase leaderboard will be handled by presenter.js module
+        // This function is kept for compatibility but does nothing
         function updateLeaderboard() {
-            if (!currentScenario) return;
-            
-            const stored = localStorage.getItem('mastaGhimauParticipants');
-            if (stored) {
-                participants = JSON.parse(stored);
-                renderLeaderboard();
-            }
+            // Firebase leaderboard is now handled by presenter.js
+            console.log('LocalStorage leaderboard disabled - using Firebase');
         }
         
         function renderLeaderboard() {
-            const container = document.getElementById('leaderboard');
-            
-            if (participants.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; color: var(--text-secondary); padding: 60px 0; font-size: 14px;">
-                        Waiting for participants...<br><br>
-                        <span style="font-size: 12px;">Scan the AR marker to join!</span>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Sort by score
-            const sorted = [...participants].sort((a, b) => b.score - a.score);
-            
-            let html = '';
-            sorted.forEach((p, idx) => {
-                const rankClass = idx < 3 ? 'top' : '';
-                const progress = Math.round((p.answered / p.total) * 100);
-                
-                html += `
-                    <div class="leaderboard-item">
-                        <div class="rank ${rankClass}">${idx + 1}</div>
-                        <div class="participant-info">
-                            <div class="participant-name">${p.name}</div>
-                            <div class="participant-progress">${p.answered}/${p.total} answered (${progress}%)</div>
-                        </div>
-                        <div class="participant-score">${p.score}%</div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-            
-            // Update stats
-            document.getElementById('stat-participants').textContent = participants.length;
-            const completed = participants.filter(p => p.answered === p.total).length;
-            document.getElementById('stat-completed').textContent = completed;
-            
-            const avg = participants.length > 0 
-                ? Math.round(participants.reduce((a, p) => a + p.score, 0) / participants.length)
-                : 0;
-            document.getElementById('stat-avg').textContent = avg + '%';
+            // This function is now handled by presenter.js
+            console.log('renderLeaderboard disabled - using Firebase from presenter.js');
         }
         
         // Fullscreen shortcut

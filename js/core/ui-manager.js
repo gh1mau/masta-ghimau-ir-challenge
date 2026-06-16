@@ -82,20 +82,24 @@ class UIManager {
     }
 
     showQuestion(question, options, onAnswer, currentIndex = 0, totalQuestions = 3) {
-        // Ensure question panel is visible with proper styling
+        // Ensure question panel is visible with proper styling - FULL SCREEN
         const panel = this.elements.questionPanel;
         if (panel) {
-            panel.style.display = 'block';
-            panel.style.position = 'fixed';
-            panel.style.top = '0';
-            panel.style.left = '0';
-            panel.style.width = '100%';
-            panel.style.height = '100%';
-            panel.style.zIndex = '2000';
-            panel.style.background = 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%)';
-            panel.style.padding = '0';
-            panel.style.overflowY = 'auto';
-            panel.style.boxSizing = 'border-box';
+            panel.style.cssText = `
+                display: block !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 100vw !important;
+                height: 100vh !important;
+                z-index: 9999 !important;
+                background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%) !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow-y: auto !important;
+                box-sizing: border-box !important;
+                border: none !important;
+            `;
         }
 
         // Calculate progress percentage
@@ -104,15 +108,14 @@ class UIManager {
         // Clear panel and create new professional layout - FULL HEIGHT
         panel.innerHTML = `
             <div style="
-                max-width: 700px;
+                max-width: 800px;
                 margin: 0 auto;
-                padding: 20px;
+                padding: 15px 20px;
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
-                padding-top: 40px;
-                padding-bottom: 40px;
+                box-sizing: border-box;
             ">
                 <!-- Header with Progress -->
                 <div style="

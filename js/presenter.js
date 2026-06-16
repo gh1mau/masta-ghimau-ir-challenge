@@ -325,7 +325,12 @@ class PresenterApp {
         const container = document.getElementById('leaderboard');
 
         if (!players || players.length === 0) {
-            container.innerHTML = '<div class="text-center text-gray-500 py-4">No participants yet</div>';
+            container.innerHTML = `
+                <div style="text-align: center; color: var(--text-secondary); padding: 60px 0; font-size: 14px;">
+                    Waiting for participants...<br><br>
+                    <span style="font-size: 12px;">Scan the AR marker to join!</span>
+                </div>
+            `;
             return;
         }
 
@@ -334,15 +339,34 @@ class PresenterApp {
             .sort((a, b) => b.score - a.score)
             .map((player, index) => ({ ...player, rank: index + 1 }));
 
-        container.innerHTML = sortedPlayers.map((entry, index) => `
-            <div class="leaderboard-item ${index < 3 ? 'top-3' : ''}">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold ${index < 3 ? 'text-yellow-400' : 'text-green-400'}">#${entry.rank}</span>
-                    <span class="truncate max-w-[120px]">${entry.name}</span>
+        let html = '';
+        sortedPlayers.forEach((entry, index) => {
+            const rankClass = index < 3 ? 'top' : '';
+            const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+            
+            html += `
+                <div class="leaderboard-item">
+                    <div class="rank ${rankClass}">${rankEmoji}</div>
+                    <div class="participant-info">
+                        <div class="participant-name">${entry.name}</div>
+                        <div class="participant-progress">${entry.score} points</div>
+                    </div>
+                    <div class="participant-score">${entry.score}</div>
                 </div>
-                <span class="font-bold text-green-400">${entry.score} pts</span>
-            </div>
-        `).join('');
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Update stats
+        document.getElementById('stat-participants').textContent = players.length;
+        const completed = players.filter(p => p.score > 0).length;
+        document.getElementById('stat-completed').textContent = completed;
+        
+        const avg = players.length > 0 
+            ? Math.round(players.reduce((a, p) => a + p.score, 0) / players.length)
+            : 0;
+        document.getElementById('stat-avg').textContent = avg + '%';
     }
 
     updateParticipantCount(players = null) {
