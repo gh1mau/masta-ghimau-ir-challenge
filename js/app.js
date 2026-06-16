@@ -212,8 +212,22 @@ class IRChallengeApp {
             }
         }
 
-        // Show first question
-        this.showCurrentQuestion();
+        // Show countdown before quiz
+        this.showGhostCountdown();
+    }
+
+    showGhostCountdown() {
+        let countdown = 10;
+        const countdownInterval = setInterval(() => {
+            uiManager.updateStatus('👻', 'Mistik Ghost Appears!', `Quiz starts in ${countdown} seconds...`);
+            countdown--;
+
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                uiManager.hideStatus();
+                this.showCurrentQuestion();
+            }
+        }, 1000);
     }
 
     onTargetLost() {
