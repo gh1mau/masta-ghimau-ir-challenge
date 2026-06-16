@@ -89,32 +89,6 @@ class IRChallengeApp {
                 this.sessionCode = localStorage.getItem('mastaGhimau_sessionId') || this.challengeId;
             }
 
-            // DEBUG: Show visible debug info on page
-            const debugDiv = document.createElement('div');
-            debugDiv.id = 'firebase-debug';
-            debugDiv.style.cssText = `
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                background: rgba(0,0,0,0.9);
-                color: #00ff00;
-                padding: 15px;
-                border-radius: 8px;
-                font-family: monospace;
-                font-size: 12px;
-                z-index: 10000;
-                max-width: 400px;
-                border: 2px solid #00ff00;
-            `;
-            debugDiv.innerHTML = `
-                <div style="color: #00ffff; font-weight: bold; margin-bottom: 10px;">🔥 Firebase Debug</div>
-                <div>Session: ${this.sessionCode}</div>
-                <div>Player: ${nickname}</div>
-                <div>Firebase: ${this.firebaseInitialized ? '✓ Ready' : '✗ Not Ready'}</div>
-                <div id="firebase-status">Status: Initializing...</div>
-            `;
-            document.body.appendChild(debugDiv);
-
             console.log('========================================');
             console.log('CHALLENGE PAGE JOINING SESSION');
             console.log('Session Code:', this.sessionCode);
@@ -179,17 +153,12 @@ class IRChallengeApp {
     }
 
     async updateLeaderboardScore(points) {
-        console.log('updateLeaderboardScore called:', { points, firebaseInitialized: this.firebaseInitialized, currentSession: leaderboardManager.currentSession });
+        console.log('updateLeaderboardScore called:', { points, totalScore: this.score, firebaseInitialized: this.firebaseInitialized, currentSession: leaderboardManager.currentSession });
         
         if (this.firebaseInitialized && leaderboardManager.currentSession) {
-            console.log('Updating score in Firebase:', points);
-            const success = await leaderboardManager.updateScore(points);
-            
-            // Update debug display
-            const statusDiv = document.getElementById('firebase-status');
-            if (statusDiv) {
-                statusDiv.textContent = `Status: Score updated to ${this.score}`;
-            }
+            // Send TOTAL score to Firebase, not just the points
+            console.log('Updating TOTAL score in Firebase:', this.score);
+            const success = await leaderboardManager.updateScore(this.score);
             
             return success;
         } else {
