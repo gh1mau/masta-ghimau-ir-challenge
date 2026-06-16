@@ -766,10 +766,18 @@
             const currentUrl = window.location.href;
             const baseUrl = currentUrl.replace('presenter.html', 'challenge.html');
             
-            // Create unique marker for this scenario
-            const markerUrl = `${baseUrl}?scenario=${scenarioId}&marker=${Date.now()}`;
+            // Get or create session ID
+            let sessionId = localStorage.getItem('mastaGhimau_sessionId');
+            if (!sessionId) {
+                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('mastaGhimau_sessionId', sessionId);
+            }
+            
+            // Create unique marker for this scenario WITH session ID
+            const markerUrl = `${baseUrl}?scenario=${scenarioId}&session=${sessionId}&marker=${Date.now()}`;
             
             console.log('QR Code URL:', markerUrl); // Debug
+            console.log('Session ID:', sessionId); // Debug
             
             new QRCode(container, {
                 text: markerUrl,
@@ -779,6 +787,42 @@
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
+            
+            // Also display the session ID for manual entry
+            const sessionDisplay = document.createElement('div');
+            sessionDisplay.style.cssText = `
+                margin-top: 10px;
+                padding: 8px;
+                background: rgba(0, 212, 255, 0.1);
+                border: 1px solid #00d4ff;
+                border-radius: 6px;
+                font-family: monospace;
+                font-size: 11px;
+                color: #00d4ff;
+                word-break: break-all;
+            `;
+            sessionDisplay.textContent = `Session: ${sessionId}`;
+            container.appendChild(sessionDisplay);
+            
+            // Add link to leaderboard
+            const leaderboardLink = document.createElement('a');
+            leaderboardLink.href = `leaderboard.html?session=${sessionId}`;
+            leaderboardLink.target = '_blank';
+            leaderboardLink.style.cssText = `
+                display: block;
+                margin-top: 10px;
+                padding: 10px;
+                background: rgba(16, 185, 129, 0.1);
+                border: 1px solid #10b981;
+                border-radius: 6px;
+                font-family: monospace;
+                font-size: 12px;
+                color: #10b981;
+                text-decoration: none;
+                text-align: center;
+            `;
+            leaderboardLink.textContent = '🏆 Open Leaderboard';
+            container.appendChild(leaderboardLink);
         }
         
         function updateTimer(seconds) {

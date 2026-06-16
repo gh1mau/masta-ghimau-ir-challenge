@@ -25,13 +25,27 @@ let app = null;
 let database = null;
 let firebaseInitialized = false;
 
+console.log('🔥 Firebase Config:', firebaseConfig);
+
 try {
+  console.log('Initializing Firebase...');
   app = initializeApp(firebaseConfig);
+  console.log('✓ Firebase app initialized');
+  
   database = getDatabase(app);
+  console.log('✓ Firebase database initialized');
+  
   firebaseInitialized = true;
   logger.info("Firebase initialized successfully");
+  console.log('✓ Firebase fully initialized and ready');
 } catch (error) {
-  logger.warn("Firebase initialization failed, running in local mode", { error: error.message });
+  console.error('✗ Firebase initialization failed:', error.message);
+  logger.error("Firebase initialization failed", { error: error.message });
+}
+
+// Export initialization status
+export function isFirebaseReady() {
+  return firebaseInitialized && database !== null;
 }
 
 /**

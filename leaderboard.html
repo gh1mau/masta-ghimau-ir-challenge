@@ -438,9 +438,26 @@
                 database = getDatabase(app);
                 log('✓ Firebase initialized successfully', 'success');
                 
-                // Get session from URL
+                // Get session from URL or localStorage
                 const urlParams = new URLSearchParams(window.location.search);
-                currentSession = urlParams.get('session') || localStorage.getItem('mastaGhimau_sessionId') || 'default_session';
+                currentSession = urlParams.get('session') || localStorage.getItem('mastaGhimau_sessionId');
+                
+                if (!currentSession) {
+                    log('⚠ No session found in URL or localStorage', 'error');
+                    document.getElementById('status-text').textContent = 'No Session - Waiting...';
+                    
+                    // Try to get session from URL again after a delay
+                    setTimeout(() => {
+                        const retryParams = new URLSearchParams(window.location.search);
+                        currentSession = retryParams.get('session') || localStorage.getItem('mastaGhimau_sessionId');
+                        if (currentSession) {
+                            log(`✓ Session found on retry: ${currentSession}`, 'success');
+                            document.getElementById('session-code').textContent = `Session: ${currentSession}`;
+                            startListening();
+                        }
+                    }, 2000);
+                    return;
+                }
                 
                 document.getElementById('session-code').textContent = `Session: ${currentSession}`;
                 log(`Session: ${currentSession}`);
