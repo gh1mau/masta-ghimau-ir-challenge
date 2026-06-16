@@ -459,10 +459,14 @@ class IRChallengeApp {
             return;
         }
 
+        const totalQuestions = this.currentChallenge.questions.length;
+
         uiManager.showQuestion(
             question.text,
             question.options,
-            (selectedIndex, btn) => this.handleAnswer(selectedIndex, btn)
+            (selectedIndex, btn) => this.handleAnswer(selectedIndex, btn),
+            this.currentQuestionIndex,
+            totalQuestions
         );
     }
 

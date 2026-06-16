@@ -145,7 +145,7 @@ class UIManager {
         }
     }
 
-    showQuestion(question, options, onAnswer) {
+    showQuestion(question, options, onAnswer, currentIndex = 0, totalQuestions = 3) {
         // Ensure question panel is visible with proper styling
         const panel = this.elements.questionPanel;
         if (panel) {
@@ -168,6 +168,10 @@ class UIManager {
                 max-width: 600px;
                 margin: 0 auto;
                 padding: 20px 0;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
             ">
                 <!-- Progress Bar -->
                 <div style="
@@ -179,7 +183,7 @@ class UIManager {
                     text-align: center;
                 ">
                     <div style="color: #00ffff; font-size: 14px; margin-bottom: 5px;">QUESTION</div>
-                    <div style="color: #00ff41; font-size: 24px; font-weight: bold;">${this.currentQuestionIndex + 1} / ${this.totalQuestions || options.length}</div>
+                    <div style="color: #00ff41; font-size: 24px; font-weight: bold;">${currentIndex + 1} / ${totalQuestions}</div>
                 </div>
 
                 <!-- Question Text -->
@@ -210,7 +214,7 @@ class UIManager {
 
         // Populate options
         const optionsContainer = document.getElementById('quiz-options-container');
-        if (optionsContainer) {
+        if (optionsContainer && options && options.length > 0) {
             options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
                 btn.className = 'quiz-option-btn';
@@ -225,6 +229,7 @@ class UIManager {
                     cursor: pointer;
                     transition: all 0.3s ease;
                     text-align: left;
+                    margin-bottom: 12px;
                 `;
 
                 // Hover effect via JS since we're setting inline styles
@@ -260,6 +265,7 @@ class UIManager {
                         font-size: 16px;
                         line-height: 1.4;
                         font-family: 'Inter', sans-serif;
+                        flex: 1;
                     ">${opt}</span>
                 `;
 

@@ -219,8 +219,10 @@ class AREngine {
         if (modelPath) {
             // Try to load GLB model
             try {
+                console.log('Attempting to load GLB model:', modelPath);
                 const model = await this.loadGLBModel(modelPath);
                 if (model) {
+                    console.log('GLB model loaded successfully, processing...');
                     // Center the model and scale appropriately for phone screen
                     this.centerAndScaleModel(model);
 
@@ -238,13 +240,18 @@ class AREngine {
                     glow.position.set(0, 0, -0.2);
                     group.add(glow);
 
+                    console.log('AR content group created with model');
                     return group;
+                } else {
+                    console.warn('Model loaded but is null/undefined');
                 }
             } catch (error) {
+                console.error('Failed to load GLB model:', error);
                 logger.warn('Failed to load GLB model, falling back to sprite', { error: error.message });
             }
         }
 
+        console.log('Using fallback ghost sprite');
         // Fallback to sprite ghost
         const ghost = this.createRealisticGhost();
         group.add(ghost);
