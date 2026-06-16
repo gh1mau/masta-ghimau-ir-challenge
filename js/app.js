@@ -503,16 +503,7 @@ class IRChallengeApp {
         // Show quiz in full screen
         const questionPanel = document.getElementById('question-panel');
         if (questionPanel) {
-            questionPanel.style.display = 'block';
-            questionPanel.style.position = 'fixed';
-            questionPanel.style.top = '0';
-            questionPanel.style.left = '0';
-            questionPanel.style.width = '100%';
-            questionPanel.style.height = '100%';
-            questionPanel.style.zIndex = '2000';
-            questionPanel.style.background = 'rgba(10, 10, 20, 0.98)';
-            questionPanel.style.padding = '20px';
-            questionPanel.style.overflowY = 'auto';
+            questionPanel.classList.add('active');
             console.log('Question panel shown');
         }
 

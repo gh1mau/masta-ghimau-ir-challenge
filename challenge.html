@@ -132,11 +132,14 @@
             border-radius: 0;
             padding: 15px;
             pointer-events: auto;
-            display: none;
+            display: none; /* Hidden by default, shown via JS */
             backdrop-filter: blur(10px);
             overflow: hidden;
-            display: flex;
             flex-direction: column;
+        }
+
+        #question-panel.active {
+            display: flex;
         }
 
         .question-text {
