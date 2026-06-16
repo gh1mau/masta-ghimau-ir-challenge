@@ -240,6 +240,8 @@ class IRChallengeApp {
 
         // Map target index to challenge ID
         const challengeId = this.getChallengeIdFromTargetIndex(targetIndex);
+        console.log('Target found:', targetIndex, 'Challenge ID:', challengeId);
+
         if (challengeId && challengeId !== this.challengeId) {
             // Load the challenge for this target
             this.loadChallenge(challengeId);
@@ -271,11 +273,15 @@ class IRChallengeApp {
                 if (anchor.group && content) {
                     anchor.group.add(content);
                     console.log('AR content added to anchor', targetIndex);
+                } else {
+                    console.error('Failed to create or add AR content');
                 }
             } catch (error) {
                 console.error('Failed to create AR content', error);
                 logger.error('Failed to create AR content', { error: error.message });
             }
+        } else {
+            console.warn('Cannot add AR content:', { arEngine: !!this.arEngine, currentChallenge: !!this.currentChallenge });
         }
 
         // Show challenge info with model for 15 seconds

@@ -5,6 +5,9 @@
  * GitHub: https://github.com/gh1mau
  */
 
+// Import Firebase leaderboard
+import { initFirebase, leaderboardManager } from './core/firebase-config.js';
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const app = new PresenterApp();
@@ -15,10 +18,12 @@ class PresenterApp {
     constructor() {
         this.currentChallengeId = 0;
         this.timer = null;
-        this.leaderboard = new RealtimeLeaderboard();
+        this.leaderboard = leaderboardManager;
+        this.firebaseInitialized = initFirebase();
         this.challengeManager = new ChallengeManager();
         this.isRunning = false;
         this.hintsRevealed = 0;
+        this.currentSession = null;
     }
 
     init() {
@@ -65,15 +70,23 @@ class PresenterApp {
     }
 
     setupLeaderboard() {
-        // Update leaderboard display every 5 seconds
-        setInterval(() => {
-            this.updateLeaderboardDisplay();
-            this.updateParticipantCount();
-        }, 5000);
+        if (!this.firebaseInitialized) {
+            console.warn('Firebase not initialized, leaderboard will not update');
+            return;
+        }
 
-        // Listen for leaderboard updates
-        this.leaderboard.onUpdate((leaderboard) => {
-            this.updateLeaderboardDisplay(leaderboard);
+        // Get session code from URL or use default
+        const urlParams = new URLSearchParams(window.location.search);
+        this.currentSession = urlParams.get('session') || 'default_session';
+
+        // Join the session as presenter (observer)
+        this.leaderboard.joinSession(this.currentSession, 'Presenter').then(() => {
+            console.log('Presenter joined leaderboard session:', this.currentSession);
+
+            // Listen for leaderboard updates
+            this.leaderboard.onLeaderboardUpdate((players) => {
+                this.updateLeaderboardDisplay(players);
+            });
         });
     }
 
@@ -290,16 +303,20 @@ class PresenterApp {
         }
     }
 
-    updateLeaderboardDisplay(leaderboard) {
+    updateLeaderboardDisplay(players) {
         const container = document.getElementById('leaderboard');
-        const data = leaderboard || this.leaderboard.getLeaderboard(10);
 
-        if (data.length === 0) {
+        if (!players || players.length === 0) {
             container.innerHTML = '<div class="text-center text-gray-500 py-4">No participants yet</div>';
             return;
         }
 
-        container.innerHTML = data.map((entry, index) => `
+        // Sort by score (highest first) and add rank
+        const sortedPlayers = players
+            .sort((a, b) => b.score - a.score)
+            .map((player, index) => ({ ...player, rank: index + 1 }));
+
+        container.innerHTML = sortedPlayers.map((entry, index) => `
             <div class="leaderboard-item ${index < 3 ? 'top-3' : ''}">
                 <div class="flex items-center gap-2">
                     <span class="font-bold ${index < 3 ? 'text-yellow-400' : 'text-green-400'}">#${entry.rank}</span>
