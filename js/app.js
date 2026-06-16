@@ -107,16 +107,18 @@ class IRChallengeApp {
     startLeaderboardListener() {
         if (!this.firebaseInitialized) return;
 
-        // Only show leaderboard on presenter page, not challenge page
-        if (window.location.pathname.includes('presenter.html')) {
-            // Show leaderboard panel
-            uiManager.showLeaderboard();
+        // Listen for updates on both challenge and presenter pages
+        leaderboardManager.onLeaderboardUpdate((players) => {
+            // Store data for completion screen
+            uiManager.leaderboardData = players;
+            uiManager.currentPlayerId = leaderboardManager.playerId;
 
-            // Listen for updates
-            leaderboardManager.onLeaderboardUpdate((players) => {
+            // Update UI if on presenter page
+            if (window.location.pathname.includes('presenter.html')) {
+                uiManager.showLeaderboard();
                 uiManager.updateLeaderboard(players, leaderboardManager.playerId);
-            });
-        }
+            }
+        });
     }
 
     async updateLeaderboardScore(points) {
@@ -255,10 +257,8 @@ class IRChallengeApp {
 
         // Map target index to challenge ID
         const challengeId = this.getChallengeIdFromTargetIndex(targetIndex);
-        console.log('Target found:', targetIndex, 'Challenge ID:', challengeId);
 
         if (challengeId && challengeId !== this.challengeId) {
-            // Load the challenge for this target
             this.loadChallenge(challengeId);
             this.challengeId = challengeId;
         }
@@ -267,50 +267,89 @@ class IRChallengeApp {
         if (this.arEngine && this.currentChallenge) {
             try {
                 const modelPath = this.currentChallenge.modelPath;
-                console.log('Loading AR content for target', targetIndex, 'model:', modelPath);
-
-                // Get the anchor for this specific target
                 const anchor = this.arEngine.anchors[targetIndex];
-                if (!anchor) {
-                    console.error('No anchor found for target', targetIndex);
-                    return;
-                }
+                if (!anchor) return;
 
-                console.log('Anchor found:', anchor);
-                console.log('Anchor group:', anchor.group);
-
-                // Clear previous content from this anchor
+                // Clear previous content
                 if (anchor.group) {
-                    console.log('Clearing previous content from anchor');
                     while(anchor.group.children.length > 0) {
                         anchor.group.remove(anchor.group.children[0]);
                     }
-                } else {
-                    console.warn('Anchor group is null, creating new group');
-                    anchor.group = new THREE.Group();
                 }
 
                 // Create and add new content
-                console.log('Creating AR content...');
                 const content = await this.arEngine.createARContent(null, modelPath);
-                console.log('AR content created:', content);
-
                 if (anchor.group && content) {
                     anchor.group.add(content);
-                    console.log('AR content added to anchor', targetIndex);
-                } else {
-                    console.error('Failed to create or add AR content:', { group: !!anchor.group, content: !!content });
                 }
             } catch (error) {
-                console.error('Failed to create AR content:', error);
                 logger.error('Failed to create AR content', { error: error.message });
             }
-        } else {
-            console.warn('Cannot add AR content:', { arEngine: !!this.arEngine, currentChallenge: !!this.currentChallenge });
         }
 
-        // Show challenge info with model for 15 seconds
-        this.showChallengeInfo();
+        // NEW FLOW: Show fullscreen AR model for 5 seconds, then show challenge info
+        this.showFullscreenARModel();
+    }
+
+    showFullscreenARModel() {
+        // Play sound
+        if (this.arEngine) {
+            this.arEngine.playSound('ghostAppear');
+        }
+
+        // Show fullscreen AR model for 5 seconds
+        let countdown = 5;
+        uiManager.showFullscreenAR(countdown);
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+
+            if (countdown > 0) {
+                uiManager.updateFullscreenARCountdown(countdown);
+                if (this.arEngine) {
+                    this.arEngine.playSound('countdown');
+                }
+            } else {
+                clearInterval(countdownInterval);
+                uiManager.hideFullscreenAR();
+                // Now show challenge info box
+                this.showChallengeInfoBox();
+            }
+        }, 1000);
+    }
+
+    showChallengeInfoBox() {
+        // Show challenge info overlay with description
+        const challengeInfo = {
+            title: this.currentChallenge.name,
+            description: this.currentChallenge.description,
+            author: 'masta ghimau'
+        };
+
+        uiManager.showChallengeInfo(challengeInfo);
+
+        // Start 10 second countdown for challenge info
+        let countdown = 10;
+        uiManager.updateChallengeCountdown(countdown);
+
+        const countdownInterval = setInterval(() => {
+            countdown--;
+
+            if (countdown > 0) {
+                uiManager.updateChallengeCountdown(countdown);
+                if (this.arEngine) {
+                    this.arEngine.playSound('countdown');
+                }
+            } else {
+                clearInterval(countdownInterval);
+                if (this.arEngine) {
+                    this.arEngine.playSound('quizStart');
+                }
+                uiManager.hideChallengeInfo();
+                // Hide AR and show full-screen quiz
+                this.hideARAndShowQuiz();
+            }
+        }, 1000);
     }
 
     getChallengeIdFromTargetIndex(targetIndex) {

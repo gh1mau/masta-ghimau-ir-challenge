@@ -81,11 +81,72 @@ class UIManager {
         }
     }
 
-    showQuestion(question, options, onAnswer) {
-        console.log('Showing question:', question);
-        console.log('Options:', options);
+    showFullscreenAR(countdown) {
+        // Create fullscreen AR overlay
+        let overlay = document.getElementById('fullscreen-ar-overlay');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'fullscreen-ar-overlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 1500;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+                align-items: center;
+                padding-bottom: 100px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(overlay);
+        }
 
-        // Ensure question panel is visible
+        overlay.innerHTML = `
+            <div style="
+                background: rgba(0, 20, 40, 0.9);
+                border: 2px solid #00ffff;
+                border-radius: 20px;
+                padding: 20px 40px;
+                text-align: center;
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+            ">
+                <div style="color: #00ffff; font-size: 14px; margin-bottom: 10px;">AR Model Display</div>
+                <div id="ar-countdown" style="
+                    color: #00ff41;
+                    font-size: 48px;
+                    font-weight: bold;
+                    font-family: 'Orbitron', sans-serif;
+                    text-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+                ">${countdown}</div>
+            </div>
+        `;
+
+        overlay.style.display = 'flex';
+    }
+
+    updateFullscreenARCountdown(countdown) {
+        const el = document.getElementById('ar-countdown');
+        if (el) {
+            el.textContent = countdown;
+            if (countdown <= 2) {
+                el.style.color = '#ff0040';
+            }
+        }
+    }
+
+    hideFullscreenAR() {
+        const overlay = document.getElementById('fullscreen-ar-overlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    showQuestion(question, options, onAnswer) {
+        // Ensure question panel is visible with proper styling
         const panel = this.elements.questionPanel;
         if (panel) {
             panel.style.display = 'block';
@@ -95,43 +156,117 @@ class UIManager {
             panel.style.width = '100%';
             panel.style.height = '100%';
             panel.style.zIndex = '2000';
-            panel.style.background = 'rgba(10, 10, 20, 0.98)';
+            panel.style.background = 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%)';
             panel.style.padding = '20px';
             panel.style.overflowY = 'auto';
+            panel.style.boxSizing = 'border-box';
         }
 
-        // Set question text
-        if (this.elements.questionText) {
-            this.elements.questionText.textContent = question;
-        }
+        // Clear panel and create new layout
+        panel.innerHTML = `
+            <div style="
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px 0;
+            ">
+                <!-- Progress Bar -->
+                <div style="
+                    background: rgba(0, 255, 255, 0.1);
+                    border: 1px solid #00ffff;
+                    border-radius: 10px;
+                    padding: 15px;
+                    margin-bottom: 30px;
+                    text-align: center;
+                ">
+                    <div style="color: #00ffff; font-size: 14px; margin-bottom: 5px;">QUESTION</div>
+                    <div style="color: #00ff41; font-size: 24px; font-weight: bold;">${this.currentQuestionIndex + 1} / ${this.totalQuestions || options.length}</div>
+                </div>
 
-        // Clear and populate options
-        if (this.elements.optionsContainer) {
-            this.elements.optionsContainer.innerHTML = '';
+                <!-- Question Text -->
+                <div style="
+                    background: rgba(0, 20, 40, 0.8);
+                    border: 2px solid #00ffff;
+                    border-radius: 15px;
+                    padding: 25px;
+                    margin-bottom: 25px;
+                    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+                ">
+                    <div id="quiz-question-text" style="
+                        color: #ffffff;
+                        font-size: 20px;
+                        line-height: 1.6;
+                        font-family: 'Inter', sans-serif;
+                    ">${question}</div>
+                </div>
 
+                <!-- Options Container -->
+                <div id="quiz-options-container" style="
+                    display: flex;
+                    flex-direction: column;
+                    gap: 12px;
+                "></div>
+            </div>
+        `;
+
+        // Populate options
+        const optionsContainer = document.getElementById('quiz-options-container');
+        if (optionsContainer) {
             options.forEach((opt, idx) => {
                 const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.textContent = opt;
+                btn.className = 'quiz-option-btn';
                 btn.style.cssText = `
-                    display: block;
+                    display: flex;
+                    align-items: center;
                     width: 100%;
-                    padding: 15px;
-                    margin: 8px 0;
-                    background: rgba(0,255,255,0.1);
-                    border: 1px solid #00ffff;
-                    color: #00ffff;
-                    border-radius: 10px;
+                    padding: 20px;
+                    background: rgba(0, 255, 255, 0.05);
+                    border: 2px solid rgba(0, 255, 255, 0.3);
+                    border-radius: 12px;
                     cursor: pointer;
+                    transition: all 0.3s ease;
                     text-align: left;
-                    font-size: 16px;
                 `;
+
+                // Hover effect via JS since we're setting inline styles
+                btn.onmouseenter = () => {
+                    btn.style.background = 'rgba(0, 255, 255, 0.15)';
+                    btn.style.borderColor = '#00ffff';
+                    btn.style.transform = 'translateX(5px)';
+                };
+                btn.onmouseleave = () => {
+                    btn.style.background = 'rgba(0, 255, 255, 0.05)';
+                    btn.style.borderColor = 'rgba(0, 255, 255, 0.3)';
+                    btn.style.transform = 'translateX(0)';
+                };
+
+                btn.innerHTML = `
+                    <span style="
+                        width: 36px;
+                        height: 36px;
+                        background: rgba(0, 255, 255, 0.2);
+                        border: 2px solid #00ffff;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        color: #00ffff;
+                        font-weight: bold;
+                        font-size: 16px;
+                        margin-right: 15px;
+                        flex-shrink: 0;
+                    ">${String.fromCharCode(65 + idx)}</span>
+                    <span style="
+                        color: #ffffff;
+                        font-size: 16px;
+                        line-height: 1.4;
+                        font-family: 'Inter', sans-serif;
+                    ">${opt}</span>
+                `;
+
                 btn.onclick = () => onAnswer(idx, btn);
-                this.elements.optionsContainer.appendChild(btn);
+                optionsContainer.appendChild(btn);
             });
         }
-
-        console.log('Question panel displayed');
     }
 
     hideQuestion() {
