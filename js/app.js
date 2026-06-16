@@ -139,7 +139,20 @@ class IRChallengeApp {
 
     getChallengeFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('challenge') || urlParams.get('scenario');
+        const scenario = urlParams.get('challenge') || urlParams.get('scenario');
+
+        // Map scenario names to challenge IDs
+        const scenarioToChallengeMap = {
+            'ransomware': 'chal_1',
+            'phishing': 'chal_2',
+            'apt': 'chal_3',
+            'ddos': 'chal_4',
+            'supplychain': 'chal_5',
+            'infostealer': 'chal_6'
+        };
+
+        // Return mapped challenge ID or the original value
+        return scenarioToChallengeMap[scenario] || scenario;
     }
 
     loadChallenge(challengeId) {
