@@ -6,528 +6,509 @@
     <title>Masta Ghimau IR Challenge | AR Edition</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-    <!-- Security: Validator Module -->
     <script src="js/modules/validator.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         :root {
-            --bg-primary: #0a0e1a;
-            --bg-secondary: #111827;
-            --bg-card: #1a1f2e;
-            --border: #2d3748;
-            --text-primary: #f7fafc;
-            --text-secondary: #a0aec0;
-            --accent: #00d4ff;
-            --accent-glow: rgba(0, 212, 255, 0.3);
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --info: #3b82f6;
+            --htb-bg: #0a0a0a;
+            --htb-surface: #141414;
+            --htb-border: #1f1f1f;
+            --htb-green: #9fef00;
+            --htb-green-dim: #7bc800;
+            --htb-red: #ff4d4d;
+            --htb-yellow: #ffcc00;
+            --htb-blue: #00b3ff;
+            --htb-text: #e0e0e0;
+            --htb-text-dim: #666;
+        }
+        
+        *::selection {
+            background: var(--htb-green);
+            color: #000;
         }
         
         body {
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            background: var(--htb-bg);
+            color: var(--htb-text);
+            font-family: 'JetBrains Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Scanline effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            pointer-events: none;
+            z-index: 1000;
         }
         
         /* Header */
         .header {
-            background: linear-gradient(90deg, var(--bg-secondary) 0%, #1a202c 100%);
-            border-bottom: 1px solid var(--border);
-            padding: 12px 24px;
+            background: var(--htb-surface);
+            border-bottom: 1px solid var(--htb-border);
+            padding: 0 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            height: 56px;
+            height: 60px;
         }
         
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
         }
         
         .brand-logo {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--accent), #0099cc);
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            background: var(--htb-green);
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
-            font-size: 14px;
+            font-size: 16px;
             color: #000;
+            text-shadow: 0 0 10px var(--htb-green);
         }
         
         .brand-text h1 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
-            color: var(--text-primary);
+            color: var(--htb-green);
+            letter-spacing: 1px;
         }
         
         .brand-text span {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--htb-text-dim);
+            text-transform: uppercase;
         }
         
-        .header-meta {
+        .status-bar {
             display: flex;
             align-items: center;
             gap: 20px;
+            font-size: 11px;
         }
         
-        .status-indicator {
+        .status-item {
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
-            color: var(--text-secondary);
+            color: var(--htb-text-dim);
+        }
+        
+        .status-item.active {
+            color: var(--htb-green);
         }
         
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: var(--success);
-            box-shadow: 0 0 8px var(--success);
+            background: var(--htb-green);
+            box-shadow: 0 0 8px var(--htb-green);
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
         }
         
-        /* Main Layout */
+        /* Main Container */
         .main-container {
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 20px;
-            padding: 20px;
-            height: calc(100vh - 56px - 40px);
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 30px;
         }
         
-        /* Panel */
-        .panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            overflow: hidden;
+        /* Terminal Header */
+        .terminal-header {
+            background: var(--htb-surface);
+            border: 1px solid var(--htb-border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            padding: 12px 20px;
             display: flex;
-            flex-direction: column;
-        }
-        
-        .panel-header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 18px;
-            display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 10px;
         }
         
-        .panel-title {
+        .terminal-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .terminal-dot.red { background: var(--htb-red); }
+        .terminal-dot.yellow { background: var(--htb-yellow); }
+        .terminal-dot.green { background: var(--htb-green); }
+        
+        .terminal-title {
+            margin-left: 10px;
             font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: var(--htb-text-dim);
         }
         
-        .panel-body {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
+        /* Main Panel */
+        .main-panel {
+            background: var(--htb-surface);
+            border: 1px solid var(--htb-border);
+            border-radius: 0 0 8px 8px;
+            padding: 40px;
         }
         
-        /* Scenario Display */
-        .scenario-display {
-            text-align: center;
-            padding: 30px;
+        /* Scenario Selection */
+        .scenario-section {
+            margin-bottom: 40px;
         }
         
-        .scenario-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
+        .section-label {
             font-size: 11px;
-            font-weight: 700;
+            color: var(--htb-green);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 20px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        .badge-critical { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
-        .badge-high { background: rgba(245, 158, 11, 0.2); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
-        .badge-medium { background: rgba(59, 130, 246, 0.2); color: var(--info); border: 1px solid rgba(59, 130, 246, 0.3); }
-        .badge-low { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .section-label::before {
+            content: '>';
+            color: var(--htb-green);
+        }
+        
+        select {
+            width: 100%;
+            padding: 15px 20px;
+            background: var(--htb-bg);
+            color: var(--htb-text);
+            border: 1px solid var(--htb-border);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        select:hover, select:focus {
+            border-color: var(--htb-green);
+            outline: none;
+        }
+        
+        /* Scenario Info */
+        .scenario-info {
+            display: none;
+            margin-bottom: 40px;
+            padding: 25px;
+            background: var(--htb-bg);
+            border: 1px solid var(--htb-border);
+            border-left: 3px solid var(--htb-green);
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .scenario-info.active {
+            display: block;
+        }
         
         .scenario-title {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            line-height: 1.2;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--htb-green);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(159, 239, 0, 0.3);
         }
         
         .threat-actor {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            margin-bottom: 20px;
+            color: var(--htb-red);
+            font-size: 12px;
+            margin-bottom: 15px;
+            padding: 5px 12px;
+            background: rgba(255, 77, 77, 0.1);
+            border: 1px solid rgba(255, 77, 77, 0.3);
+            border-radius: 4px;
         }
         
         .scenario-desc {
-            font-size: 16px;
-            line-height: 1.7;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 30px;
+            font-size: 13px;
+            line-height: 1.8;
+            color: var(--htb-text-dim);
         }
         
-        /* AR Marker Display */
-        .ar-marker-section {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin: 20px 0;
+        .severity-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 3px;
+            margin-top: 15px;
+        }
+        
+        .severity-critical {
+            background: rgba(255, 77, 77, 0.2);
+            color: var(--htb-red);
+            border: 1px solid var(--htb-red);
+        }
+        
+        .severity-high {
+            background: rgba(255, 204, 0, 0.2);
+            color: var(--htb-yellow);
+            border: 1px solid var(--htb-yellow);
+        }
+        
+        .severity-medium {
+            background: rgba(0, 179, 255, 0.2);
+            color: var(--htb-blue);
+            border: 1px solid var(--htb-blue);
+        }
+        
+        .severity-low {
+            background: rgba(159, 239, 0, 0.2);
+            color: var(--htb-green);
+            border: 1px solid var(--htb-green);
+        }
+        
+        /* QR Section */
+        .qr-section {
+            display: none;
             text-align: center;
+            padding: 40px;
+            background: var(--htb-bg);
+            border: 1px solid var(--htb-border);
+            border-radius: 4px;
         }
         
-        .ar-marker-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a202c;
-            margin-bottom: 15px;
+        .qr-section.active {
+            display: block;
+        }
+        
+        .qr-label {
+            font-size: 11px;
+            color: var(--htb-green);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
         }
         
         #ar-marker {
-            width: 250px;
-            height: 250px;
-            margin: 0 auto;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 25px;
             background: white;
-            padding: 10px;
+            padding: 15px;
             border-radius: 8px;
+            box-shadow: 0 0 30px rgba(159, 239, 0, 0.1);
         }
         
         #ar-marker img, #ar-marker canvas {
-            width: 230px !important;
-            height: 230px !important;
+            width: 250px !important;
+            height: 250px !important;
         }
         
-        .ar-instructions {
-            margin-top: 15px;
-            font-size: 13px;
-            color: #4a5568;
+        .qr-instructions {
+            font-size: 12px;
+            color: var(--htb-text-dim);
+            line-height: 1.8;
         }
         
-        .ar-instructions strong {
-            color: #1a202c;
+        .qr-instructions strong {
+            color: var(--htb-green);
         }
         
-        /* Timer */
-        .timer-display {
-            text-align: center;
-            padding: 20px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        
-        .timer-label {
+        /* Session Info */
+        .session-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--htb-surface);
+            border: 1px solid var(--htb-border);
+            border-radius: 4px;
             font-size: 11px;
-            color: var(--danger);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
         }
         
-        .timer-value {
-            font-size: 48px;
-            font-weight: 800;
-            color: var(--danger);
+        .session-id {
+            color: var(--htb-green);
             font-family: 'JetBrains Mono', monospace;
-            text-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+            word-break: break-all;
+        }
+        
+        .leaderboard-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: rgba(159, 239, 0, 0.1);
+            border: 1px solid var(--htb-green);
+            border-radius: 4px;
+            color: var(--htb-green);
+            text-decoration: none;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+        
+        .leaderboard-link:hover {
+            background: var(--htb-green);
+            color: #000;
         }
         
         /* Controls */
         .controls {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 30px;
         }
         
         .btn {
             flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 8px;
-            font-size: 13px;
+            padding: 15px 30px;
+            background: transparent;
+            border: 1px solid var(--htb-green);
+            border-radius: 4px;
+            color: var(--htb-green);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
         
-        .btn-primary {
-            background: var(--success);
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background: #059669;
-        }
-        
-        .btn-secondary {
-            background: var(--bg-secondary);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--border);
-            color: var(--text-primary);
-        }
-        
-        /* Scenario Select */
-        .scenario-select {
-            margin-top: 20px;
-        }
-        
-        .scenario-select label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        
-        select {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-        
-        /* Leaderboard */
-        .leaderboard-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        
-        .leaderboard-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
-        
-        .rank {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--border);
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
-        }
-        
-        .rank.top {
-            background: linear-gradient(135deg, #ffd700, #ffaa00);
+        .btn:hover {
+            background: var(--htb-green);
             color: #000;
+            box-shadow: 0 0 20px rgba(159, 239, 0, 0.4);
         }
         
-        .participant-info {
-            flex: 1;
+        .btn:disabled {
+            border-color: var(--htb-text-dim);
+            color: var(--htb-text-dim);
+            cursor: not-allowed;
         }
         
-        .participant-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-primary);
+        .btn:disabled:hover {
+            background: transparent;
+            box-shadow: none;
         }
         
-        .participant-progress {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-        
-        .participant-score {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
-        }
-        
-        .stat-box {
+        /* Timer */
+        .timer-section {
+            display: none;
+            margin-top: 30px;
+            padding: 25px;
+            background: var(--htb-bg);
+            border: 1px solid var(--htb-border);
+            border-left: 3px solid var(--htb-red);
+            border-radius: 0 4px 4px 0;
             text-align: center;
-            padding: 15px;
-            background: var(--bg-primary);
-            border-radius: 8px;
         }
         
-        .stat-value {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
+        .timer-section.active {
+            display: block;
         }
         
-        .stat-label {
+        .timer-label {
             font-size: 10px;
-            color: var(--text-secondary);
+            color: var(--htb-red);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 4px;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .timer-value {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--htb-red);
+            text-shadow: 0 0 20px rgba(255, 77, 77, 0.4);
         }
         
         /* Footer */
         .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 12px 24px;
             text-align: center;
+            padding: 30px;
             font-size: 11px;
-            color: var(--text-secondary);
-            font-family: 'JetBrains Mono', monospace;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            color: var(--htb-text-dim);
+            border-top: 1px solid var(--htb-border);
+            margin-top: 40px;
         }
         
         .footer a {
-            color: var(--accent);
+            color: var(--htb-green);
             text-decoration: none;
-            margin: 0 8px;
         }
         
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Glitch effect for title */
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before,
+        .glitch::after {
+            content: attr(data-text);
+            position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 14, 26, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-        
-        .modal-box {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 400px;
             width: 100%;
+            height: 100%;
         }
         
-        .modal-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 15px;
+        .glitch::before {
+            animation: glitch-1 2s infinite;
+            color: var(--htb-red);
+            z-index: -1;
         }
         
-        .modal-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 20px;
+        .glitch::after {
+            animation: glitch-2 2s infinite;
+            color: var(--htb-blue);
+            z-index: -2;
         }
         
-        .input-group {
-            margin-bottom: 20px;
+        @keyframes glitch-1 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(20% 0 30% 0); transform: translate(-2px, 2px); }
+            40% { clip-path: inset(50% 0 20% 0); transform: translate(2px, -2px); }
+            60% { clip-path: inset(10% 0 60% 0); transform: translate(-2px, 0); }
+            80% { clip-path: inset(80% 0 5% 0); transform: translate(2px, 2px); }
         }
         
-        .input-group label {
-            display: block;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
+        @keyframes glitch-2 {
+            0%, 100% { clip-path: inset(0 0 0 0); transform: translate(0); }
+            20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -2px); }
+            40% { clip-path: inset(30% 0 40% 0); transform: translate(-2px, 2px); }
+            60% { clip-path: inset(10% 0 70% 0); transform: translate(2px, 0); }
+            80% { clip-path: inset(40% 0 30% 0); transform: translate(-2px, -2px); }
         }
-        
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--accent);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-        }
-        
-        .input-hint {
-            font-size: 11px;
-            color: var(--text-secondary);
-            margin-top: 8px;
-        }
-        
-        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <!-- Setup Modal - Hidden for GitHub Pages -->
-    <div id="setup-modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <div class="modal-title">🎯 AR Challenge Setup</div>
-            <div class="modal-text">
-                GitHub Pages mode - No setup required!
-            </div>
-            <button class="btn btn-primary" onclick="document.getElementById('setup-modal').classList.add('hidden')" style="width: 100%;">Start Challenge</button>
-        </div>
-    </div>
-
     <!-- Header -->
     <header class="header">
         <div class="brand">
@@ -537,119 +518,99 @@
                 <span>AR Edition v3.0</span>
             </div>
         </div>
-        <div class="header-meta">
-            <div class="status-indicator">
+        <div class="status-bar">
+            <div class="status-item active">
                 <div class="status-dot"></div>
-                <span>AR System Online</span>
+                <span>SYSTEM ONLINE</span>
+            </div>
+            <div class="status-item">
+                <span>FIREBASE: CONNECTED</span>
             </div>
         </div>
     </header>
 
     <!-- Main Content -->
     <div class="main-container">
-        
-        <!-- Left: AR Marker & Scenario -->
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title">AR Marker - Scan with Phone</span>
-                <span class="scenario-badge badge-low" id="severity-badge">Standby</span>
-            </div>
-            <div class="panel-body">
-                <div class="scenario-display">
-                    <h2 class="scenario-title" id="scenario-title">Select a Challenge</h2>
-                    
-                    <div class="threat-actor" id="threat-actor" style="display: none;">
-                        ⚠ <span id="actor-name">Unknown Actor</span>
-                    </div>
-                    
-                    <p class="scenario-desc" id="scenario-desc">
-                        Choose a cyber attack scenario. Participants will scan the AR marker below to reveal the challenge in augmented reality.
-                    </p>
-                </div>
-                
-                <!-- AR Marker Display -->
-                <div class="ar-marker-section" id="marker-section" style="display: none;">
-                    <div class="ar-marker-title">📱 Scan this marker with your phone</div>
-                    <div id="ar-marker"></div>
-                    <div class="ar-instructions">
-                        <strong>How to play:</strong><br>
-                        1. Open camera on your phone<br>
-                        2. Point at this QR marker<br>
-                        3. Answer the AR questions!
-                    </div>
-                </div>
-                
-                <div class="timer-display" id="timer-section" style="display: none;">
-                    <div class="timer-label">Time Remaining</div>
-                    <div class="timer-value" id="timer">05:00</div>
-                </div>
-                
-                <div class="controls">
-                    <button class="btn btn-primary" onclick="startChallenge()">▶ Start Challenge</button>
-                    <button class="btn btn-secondary" onclick="showAnswer()">Show Answer</button>
-                </div>
-                
-                <div class="scenario-select">
-                    <label>Select Attack Scenario</label>
-                    <select id="scenario-select" onchange="loadScenario()">
-                        <option value="">-- Choose Scenario --</option>
-                        <option value="ransomware">🚨 Ransomware Attack</option>
-                        <option value="phishing">📧 Spear Phishing</option>
-                        <option value="apt">🕵️ APT Data Exfiltration</option>
-                        <option value="supply">📦 Supply Chain Attack</option>
-                        <option value="ddos">⚡ DDoS & Defacement</option>
-                        <option value="infostealer">🔑 InfoStealer Outbreak</option>
-                    </select>
-                </div>
-            </div>
+        <!-- Terminal Window -->
+        <div class="terminal-header">
+            <div class="terminal-dot red"></div>
+            <div class="terminal-dot yellow"></div>
+            <div class="terminal-dot green"></div>
+            <span class="terminal-title">presenter@htb:~/ir-challenge</span>
         </div>
         
-        <!-- Right: Leaderboard -->
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title">Live Leaderboard</span>
-                <span style="font-size: 11px; color: var(--success);">● Live</span>
+        <div class="main-panel">
+            <!-- Scenario Selection -->
+            <div class="scenario-section">
+                <div class="section-label">Select Target</div>
+                <select id="scenario-select" onchange="loadScenario()">
+                    <option value="">-- Choose Attack Scenario --</option>
+                    <option value="ransomware">[CRITICAL] Ransomware Attack</option>
+                    <option value="phishing">[HIGH] Spear Phishing Campaign</option>
+                    <option value="apt">[CRITICAL] APT Data Exfiltration</option>
+                    <option value="supply">[HIGH] Supply Chain Attack</option>
+                    <option value="ddos">[MEDIUM] DDoS & Defacement</option>
+                    <option value="infostealer">[HIGH] InfoStealer Outbreak</option>
+                </select>
             </div>
-            <div class="panel-body">
-                <div class="leaderboard-list" id="leaderboard">
-                    <div style="text-align: center; color: var(--text-secondary); padding: 60px 0; font-size: 14px;">
-                        Waiting for participants...<br><br>
-                        <span style="font-size: 12px;">Scan the AR marker to join!</span>
-                    </div>
+            
+            <!-- Scenario Info -->
+            <div class="scenario-info" id="scenario-info">
+                <div class="scenario-title" id="scenario-title">Select a Challenge</div>
+                <div class="threat-actor" id="threat-actor" style="display: none;">
+                    ⚠ THREAT ACTOR: <span id="actor-name">Unknown</span>
                 </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <div class="stat-value" id="stat-participants">0</div>
-                        <div class="stat-label">Active</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="stat-completed">0</div>
-                        <div class="stat-label">Completed</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="stat-avg">0%</div>
-                        <div class="stat-label">Avg Score</div>
-                    </div>
-                    <div class="stat-box">
-                        <div class="stat-value" id="stat-time">--</div>
-                        <div class="stat-label">Time Left</div>
-                    </div>
+                <div class="scenario-desc" id="scenario-desc">
+                    Choose a cyber attack scenario. Participants will scan the AR marker to reveal the challenge.
                 </div>
+                <div class="severity-badge" id="severity-badge">STANDBY</div>
+            </div>
+            
+            <!-- QR Code Section -->
+            <div class="qr-section" id="qr-section">
+                <div class="qr-label">>> Initialize AR Challenge</div>
+                <div id="ar-marker"></div>
+                <div class="qr-instructions">
+                    <strong>INSTRUCTIONS:</strong><br>
+                    1. Open camera on mobile device<br>
+                    2. Scan QR code above<br>
+                    3. Complete the AR challenge
+                </div>
+                <div class="session-info" id="session-info-box" style="display: none;">
+                    <div>SESSION ID: <span class="session-id" id="session-id"></span></div>
+                    <a href="#" class="leaderboard-link" id="leaderboard-link" target="_blank">
+                        [ OPEN LEADERBOARD ]
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Timer -->
+            <div class="timer-section" id="timer-section">
+                <div class="timer-label">Time Remaining</div>
+                <div class="timer-value" id="timer">00:00</div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <button class="btn" id="start-btn" onclick="startChallenge()" disabled>
+                    [ START CHALLENGE ]
+                </button>
+                <button class="btn" onclick="showAnswer()">
+                    [ SHOW ANSWER ]
+                </button>
             </div>
         </div>
     </div>
     
     <!-- Footer -->
     <footer class="footer">
-        © 2024 Hussein Mohamed masta ghimau | 
+        <span style="color: var(--htb-green);">root@htb</span>:<span style="color: var(--htb-blue);">~/masta-ghimau</span>$ 
+        <span style="color: var(--htb-text-dim);">© 2024 Hussein Mohamed masta ghimau | 
         <a href="https://www.youtube.com/@mastaghimau" target="_blank">YouTube</a> | 
-        <a href="https://github.com/gh1mau" target="_blank">GitHub</a>
+        <a href="https://github.com/gh1mau" target="_blank">GitHub</a></span>
     </footer>
 
     <script>
-        let serverIP = localStorage.getItem('mastaGhimauServerIP') || '';
-        let participants = [];
         let currentScenario = null;
         let timerInterval = null;
         
@@ -704,30 +665,13 @@
             }
         };
         
-        window.onload = () => {
-            // GitHub Pages mode - no IP setup needed
-            // Poll for leaderboard updates
-            setInterval(updateLeaderboard, 2000);
-        };
-        
-        function saveSettings() {
-            const ip = document.getElementById('ip-input').value.trim();
-            if (!ip) {
-                alert('Please enter IP address');
-                return;
-            }
-            serverIP = ip;
-            localStorage.setItem('mastaGhimauServerIP', serverIP);
-            document.getElementById('setup-modal').classList.add('hidden');
-        }
-        
         function loadScenario() {
             const select = document.getElementById('scenario-select');
             const value = select.value;
 
             if (!value) return;
 
-            // SECURITY: Validate scenario against whitelist
+            // SECURITY: Validate scenario
             const sanitizedScenario = validator.sanitizeURLParam(value);
             if (!sanitizedScenario || !validator.isValidScenario(sanitizedScenario)) {
                 console.warn('Invalid scenario rejected:', value);
@@ -743,93 +687,51 @@
             document.getElementById('scenario-desc').textContent = currentScenario.desc;
             document.getElementById('actor-name').textContent = currentScenario.actor;
             document.getElementById('threat-actor').style.display = 'inline-flex';
-            document.getElementById('timer-section').style.display = 'block';
-            document.getElementById('marker-section').style.display = 'block';
+            document.getElementById('scenario-info').classList.add('active');
+            document.getElementById('qr-section').classList.add('active');
             
             // Update severity badge
             const badge = document.getElementById('severity-badge');
-            badge.className = 'scenario-badge badge-' + currentScenario.severity;
-            badge.textContent = currentScenario.severity;
+            badge.className = 'severity-badge severity-' + currentScenario.severity;
+            badge.textContent = '[' + currentScenario.severity.toUpperCase() + '] ' + currentScenario.questions + ' QUESTIONS';
             
-            // Generate AR marker QR
+            // Enable start button
+            document.getElementById('start-btn').disabled = false;
+            
+            // Generate QR
             generateARMarker(value);
-            
-            // Update timer display
-            updateTimer(currentScenario.timeLimit);
         }
         
         function generateARMarker(scenarioId) {
             const container = document.getElementById('ar-marker');
             container.innerHTML = '';
             
-            // Get base URL for GitHub Pages
             const currentUrl = window.location.href;
             const baseUrl = currentUrl.replace('presenter.html', 'challenge.html');
             
             // Get or create session ID
             let sessionId = localStorage.getItem('mastaGhimau_sessionId');
             if (!sessionId) {
-                sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                sessionId = 'htb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('mastaGhimau_sessionId', sessionId);
             }
             
-            // Create unique marker for this scenario WITH session ID
             const markerUrl = `${baseUrl}?scenario=${scenarioId}&session=${sessionId}&marker=${Date.now()}`;
             
-            console.log('QR Code URL:', markerUrl); // Debug
-            console.log('Session ID:', sessionId); // Debug
-            
+            // Generate QR
             new QRCode(container, {
                 text: markerUrl,
-                width: 230,
-                height: 230,
+                width: 250,
+                height: 250,
                 colorDark: "#000000",
                 colorLight: "#ffffff",
                 correctLevel: QRCode.CorrectLevel.H
             });
             
-            // Also display the session ID for manual entry
-            const sessionDisplay = document.createElement('div');
-            sessionDisplay.style.cssText = `
-                margin-top: 10px;
-                padding: 8px;
-                background: rgba(0, 212, 255, 0.1);
-                border: 1px solid #00d4ff;
-                border-radius: 6px;
-                font-family: monospace;
-                font-size: 11px;
-                color: #00d4ff;
-                word-break: break-all;
-            `;
-            sessionDisplay.textContent = `Session: ${sessionId}`;
-            container.appendChild(sessionDisplay);
-            
-            // Add link to leaderboard
-            const leaderboardLink = document.createElement('a');
-            leaderboardLink.href = `leaderboard.html?session=${sessionId}`;
-            leaderboardLink.target = '_blank';
-            leaderboardLink.style.cssText = `
-                display: block;
-                margin-top: 10px;
-                padding: 10px;
-                background: rgba(16, 185, 129, 0.1);
-                border: 1px solid #10b981;
-                border-radius: 6px;
-                font-family: monospace;
-                font-size: 12px;
-                color: #10b981;
-                text-decoration: none;
-                text-align: center;
-            `;
-            leaderboardLink.textContent = '🏆 Open Leaderboard';
-            container.appendChild(leaderboardLink);
-        }
-        
-        function updateTimer(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            document.getElementById('timer').textContent = 
-                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            // Show session info
+            document.getElementById('session-info-box').style.display = 'block';
+            document.getElementById('session-id').textContent = sessionId;
+            document.getElementById('leaderboard-link').href = `leaderboard.html?session=${sessionId}`;
         }
         
         function startChallenge() {
@@ -841,14 +743,12 @@
             let timeLeft = currentScenario.timeLimit;
             clearInterval(timerInterval);
             
+            document.getElementById('timer-section').classList.add('active');
+            updateTimer(timeLeft);
+            
             timerInterval = setInterval(() => {
                 timeLeft--;
                 updateTimer(timeLeft);
-                
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                document.getElementById('stat-time').textContent = 
-                    `${mins}:${secs.toString().padStart(2, '0')}`;
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerInterval);
@@ -857,32 +757,17 @@
             }, 1000);
         }
         
+        function updateTimer(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('timer').textContent = 
+                `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
         function showAnswer() {
             if (!currentScenario) return;
-            alert(`${currentScenario.title}\n\nKey Points:\n• Severity: ${currentScenario.severity}\n• Actor: ${currentScenario.actor}\n• Questions: ${currentScenario.questions}`);
+            alert(`[ ${currentScenario.title} ]\n\nSeverity: ${currentScenario.severity.toUpperCase()}\nActor: ${currentScenario.actor}\nQuestions: ${currentScenario.questions}`);
         }
-        
-        // Firebase leaderboard will be handled by presenter.js module
-        // This function is kept for compatibility but does nothing
-        function updateLeaderboard() {
-            // Firebase leaderboard is now handled by presenter.js
-            console.log('LocalStorage leaderboard disabled - using Firebase');
-        }
-        
-        function renderLeaderboard() {
-            // This function is now handled by presenter.js
-            console.log('renderLeaderboard disabled - using Firebase from presenter.js');
-        }
-        
-        // Fullscreen shortcut
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'f' || e.key === 'F') {
-                document.documentElement.requestFullscreen();
-            }
-        });
     </script>
-    
-    <!-- Import presenter.js module for Firebase leaderboard -->
-    <script type="module" src="js/presenter.js"></script>
 </body>
 </html>
