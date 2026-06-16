@@ -74,18 +74,26 @@ class IRChallengeApp {
         uiManager.showNicknameModal(async (nickname) => {
             this.playerName = nickname;
 
-            // Get session code from URL or use challenge ID as default
+            // Get session code from URL - MUST match presenter session
             const urlParams = new URLSearchParams(window.location.search);
-            this.sessionCode = urlParams.get('session') || this.challengeId;
+            this.sessionCode = urlParams.get('session');
 
-            console.log('Joining session:', this.sessionCode, 'as player:', nickname);
+            // If no session in URL, try to get from localStorage (set by presenter QR)
+            if (!this.sessionCode) {
+                this.sessionCode = localStorage.getItem('mastaGhimau_sessionId') || this.challengeId;
+            }
+
+            console.log('Challenge joining session:', this.sessionCode, 'as player:', nickname);
 
             // Join leaderboard session
             if (this.firebaseInitialized) {
                 const joined = await leaderboardManager.joinSession(this.sessionCode, nickname);
                 if (joined) {
                     logger.info('Joined leaderboard session', { session: this.sessionCode, player: nickname });
-                    console.log('Successfully joined leaderboard session');
+                    console.log('Successfully joined leaderboard session:', this.sessionCode);
+
+                    // Start listening for leaderboard updates
+                    this.startLeaderboardListener();
                 } else {
                     console.warn('Failed to join leaderboard session');
                 }
@@ -268,23 +276,33 @@ class IRChallengeApp {
                     return;
                 }
 
+                console.log('Anchor found:', anchor);
+                console.log('Anchor group:', anchor.group);
+
                 // Clear previous content from this anchor
                 if (anchor.group) {
+                    console.log('Clearing previous content from anchor');
                     while(anchor.group.children.length > 0) {
                         anchor.group.remove(anchor.group.children[0]);
                     }
+                } else {
+                    console.warn('Anchor group is null, creating new group');
+                    anchor.group = new THREE.Group();
                 }
 
                 // Create and add new content
+                console.log('Creating AR content...');
                 const content = await this.arEngine.createARContent(null, modelPath);
+                console.log('AR content created:', content);
+
                 if (anchor.group && content) {
                     anchor.group.add(content);
                     console.log('AR content added to anchor', targetIndex);
                 } else {
-                    console.error('Failed to create or add AR content');
+                    console.error('Failed to create or add AR content:', { group: !!anchor.group, content: !!content });
                 }
             } catch (error) {
-                console.error('Failed to create AR content', error);
+                console.error('Failed to create AR content:', error);
                 logger.error('Failed to create AR content', { error: error.message });
             }
         } else {

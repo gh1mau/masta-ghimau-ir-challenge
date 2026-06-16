@@ -82,18 +82,56 @@ class UIManager {
     }
 
     showQuestion(question, options, onAnswer) {
-        this.elements.questionText.textContent = question;
-        this.elements.optionsContainer.innerHTML = '';
+        console.log('Showing question:', question);
+        console.log('Options:', options);
 
-        options.forEach((opt, idx) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.textContent = opt;
-            btn.onclick = () => onAnswer(idx, btn);
-            this.elements.optionsContainer.appendChild(btn);
-        });
+        // Ensure question panel is visible
+        const panel = this.elements.questionPanel;
+        if (panel) {
+            panel.style.display = 'block';
+            panel.style.position = 'fixed';
+            panel.style.top = '0';
+            panel.style.left = '0';
+            panel.style.width = '100%';
+            panel.style.height = '100%';
+            panel.style.zIndex = '2000';
+            panel.style.background = 'rgba(10, 10, 20, 0.98)';
+            panel.style.padding = '20px';
+            panel.style.overflowY = 'auto';
+        }
 
-        this.elements.questionPanel.style.display = 'block';
+        // Set question text
+        if (this.elements.questionText) {
+            this.elements.questionText.textContent = question;
+        }
+
+        // Clear and populate options
+        if (this.elements.optionsContainer) {
+            this.elements.optionsContainer.innerHTML = '';
+
+            options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = opt;
+                btn.style.cssText = `
+                    display: block;
+                    width: 100%;
+                    padding: 15px;
+                    margin: 8px 0;
+                    background: rgba(0,255,255,0.1);
+                    border: 1px solid #00ffff;
+                    color: #00ffff;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    text-align: left;
+                    font-size: 16px;
+                `;
+                btn.onclick = () => onAnswer(idx, btn);
+                this.elements.optionsContainer.appendChild(btn);
+            });
+        }
+
+        console.log('Question panel displayed');
     }
 
     hideQuestion() {

@@ -75,9 +75,11 @@ class PresenterApp {
             return;
         }
 
-        // Get session code from URL or use default
+        // Get session code from URL or generate new one
         const urlParams = new URLSearchParams(window.location.search);
-        this.currentSession = urlParams.get('session') || 'default_session';
+        this.currentSession = urlParams.get('session') || this.getSessionId();
+
+        console.log('Presenter session:', this.currentSession);
 
         // Join the session as presenter (observer)
         this.leaderboard.joinSession(this.currentSession, 'Presenter').then(() => {
@@ -85,6 +87,7 @@ class PresenterApp {
 
             // Listen for leaderboard updates
             this.leaderboard.onLeaderboardUpdate((players) => {
+                console.log('Leaderboard updated:', players);
                 this.updateLeaderboardDisplay(players);
             });
         });
