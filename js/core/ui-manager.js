@@ -268,7 +268,11 @@ class UIManager {
     }
 
     hideQuestion() {
-        this.elements.questionPanel.style.display = 'none';
+        // Remove active class instead of setting display:none
+        // This allows CSS to control visibility properly
+        if (this.elements.questionPanel) {
+            this.elements.questionPanel.classList.remove('active');
+        }
     }
 
     markAnswer(selectedBtn, correctIndex, selectedIndex, explanation) {

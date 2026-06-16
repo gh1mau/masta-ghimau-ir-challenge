@@ -512,9 +512,12 @@ class IRChallengeApp {
 
     onTargetLost(targetIndex) {
         uiManager.setTrackingStatus('lost');
-        // Only hide question if this is the current target
+        // Only hide question if this is the current target AND quiz is not in full screen mode
         if (this.arEngine && this.arEngine.currentTargetIndex === targetIndex) {
-            uiManager.hideQuestion();
+            // Don't hide quiz if challenge is already shown (full screen quiz mode)
+            if (!this.challengeShown) {
+                uiManager.hideQuestion();
+            }
         }
     }
 
