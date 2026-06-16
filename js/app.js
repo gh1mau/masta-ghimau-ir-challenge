@@ -92,13 +92,16 @@ class IRChallengeApp {
     startLeaderboardListener() {
         if (!this.firebaseInitialized) return;
 
-        // Show leaderboard panel
-        uiManager.showLeaderboard();
+        // Only show leaderboard on presenter page, not challenge page
+        if (window.location.pathname.includes('presenter.html')) {
+            // Show leaderboard panel
+            uiManager.showLeaderboard();
 
-        // Listen for updates
-        leaderboardManager.onLeaderboardUpdate((players) => {
-            uiManager.updateLeaderboard(players, leaderboardManager.playerId);
-        });
+            // Listen for updates
+            leaderboardManager.onLeaderboardUpdate((players) => {
+                uiManager.updateLeaderboard(players, leaderboardManager.playerId);
+            });
+        }
     }
 
     async updateLeaderboardScore(points) {
@@ -247,12 +250,30 @@ class IRChallengeApp {
         if (this.arEngine && this.currentChallenge) {
             try {
                 const modelPath = this.currentChallenge.modelPath;
+                console.log('Loading AR content for target', targetIndex, 'model:', modelPath);
+
+                // Get the anchor for this specific target
+                const anchor = this.arEngine.anchors[targetIndex];
+                if (!anchor) {
+                    console.error('No anchor found for target', targetIndex);
+                    return;
+                }
+
+                // Clear previous content from this anchor
+                if (anchor.group) {
+                    while(anchor.group.children.length > 0) {
+                        anchor.group.remove(anchor.group.children[0]);
+                    }
+                }
+
+                // Create and add new content
                 const content = await this.arEngine.createARContent(null, modelPath);
-                const anchor = this.arEngine.getCurrentAnchor();
-                if (anchor && anchor.group) {
+                if (anchor.group && content) {
                     anchor.group.add(content);
+                    console.log('AR content added to anchor', targetIndex);
                 }
             } catch (error) {
+                console.error('Failed to create AR content', error);
                 logger.error('Failed to create AR content', { error: error.message });
             }
         }
