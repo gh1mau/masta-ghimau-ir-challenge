@@ -403,6 +403,55 @@
     }
     </script>
 
+    <!-- Direct Nickname Handler (Non-Module) -->
+    <script>
+        // Direct handler for nickname submission
+        window.handleNicknameSubmit = function() {
+            console.log('Direct handler called');
+            const input = document.getElementById('nickname-input');
+            const modal = document.getElementById('nickname-modal');
+            const nickname = input.value.trim();
+
+            if (nickname.length >= 2 && nickname.length <= 20) {
+                console.log('Valid nickname:', nickname);
+                modal.style.display = 'none';
+
+                // Store in localStorage for app.js to pick up
+                localStorage.setItem('mastaGhimau_playerName', nickname);
+                localStorage.setItem('mastaGhimau_playerId', 'player_' + Date.now());
+
+                // Dispatch custom event for app.js
+                window.dispatchEvent(new CustomEvent('nicknameSubmitted', {
+                    detail: { nickname: nickname }
+                }));
+            } else {
+                console.log('Invalid nickname');
+                input.style.borderColor = '#ff0040';
+                setTimeout(() => {
+                    input.style.borderColor = '#00ffff';
+                }, 500);
+            }
+        };
+
+        // Attach handler when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Attaching nickname handlers');
+            const submitBtn = document.getElementById('nickname-submit');
+            const input = document.getElementById('nickname-input');
+
+            if (submitBtn) {
+                submitBtn.onclick = window.handleNicknameSubmit;
+                console.log('Submit button handler attached');
+            }
+
+            if (input) {
+                input.onkeypress = function(e) {
+                    if (e.key === 'Enter') window.handleNicknameSubmit();
+                };
+            }
+        });
+    </script>
+
     <!-- Main Application (ES Modules) -->
     <script type="module" src="js/app.js"></script>
 
