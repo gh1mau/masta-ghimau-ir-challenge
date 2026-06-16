@@ -1,0 +1,497 @@
+/* Masta Ghimau IR Challenge - Mobile AR Challenge Styles */
+/* Author: Hussein Mohamed masta ghimau */
+
+:root {
+    --cyber-green: #00ff41;
+    --cyber-dark: #0d1117;
+    --cyber-gray: #21262d;
+    --cyber-accent: #238636;
+    --cyber-yellow: #f0883e;
+    --cyber-red: #da3633;
+    --cyber-blue: #58a6ff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: 'Share Tech Mono', monospace;
+    background: var(--cyber-dark);
+    color: var(--cyber-green);
+    min-height: 100vh;
+    overflow: hidden;
+    touch-action: none;
+}
+
+/* Loading Screen */
+.cyber-loader {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.loader-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 4px solid transparent;
+    border-top-color: var(--cyber-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-ring:nth-child(2) {
+    width: 60px;
+    height: 60px;
+    top: 10px;
+    left: 10px;
+    border-top-color: var(--cyber-yellow);
+    animation-duration: 1.5s;
+    animation-direction: reverse;
+}
+
+.loader-ring:nth-child(3) {
+    width: 40px;
+    height: 40px;
+    top: 20px;
+    left: 20px;
+    border-top-color: var(--cyber-blue);
+    animation-duration: 2s;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* AR Container */
+#ar-container {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+#video {
+    object-fit: cover;
+}
+
+#ar-canvas {
+    z-index: 2;
+}
+
+/* UI Overlay */
+#ui-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+}
+
+/* Mobile Header */
+.cyber-header-mobile {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.cyber-title {
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px var(--cyber-green);
+}
+
+.cyber-timer {
+    font-family: 'Orbitron', sans-serif;
+    text-shadow: 0 0 10px var(--cyber-green);
+}
+
+.cyber-timer.warning {
+    color: var(--cyber-yellow);
+    animation: pulse-warning 1s ease-in-out infinite;
+}
+
+.cyber-timer.danger {
+    color: var(--cyber-red);
+    animation: pulse-danger 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse-warning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes pulse-danger {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Scanning Frame */
+.cyber-scan-frame {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 2px solid var(--cyber-green);
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+    animation: frame-pulse 2s ease-in-out infinite;
+}
+
+@keyframes frame-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        border-color: var(--cyber-green);
+    }
+    50% { 
+        box-shadow: 0 0 50px rgba(0, 255, 65, 0.5);
+        border-color: var(--cyber-accent);
+    }
+}
+
+.scan-icon {
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Challenge Panel */
+#challenge-panel {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-top: 2px solid var(--cyber-green);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+}
+
+#challenge-panel.active {
+    transform: translateY(0) !important;
+}
+
+.cyber-task {
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Cyber Buttons */
+.cyber-btn {
+    font-family: 'Orbitron', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+}
+
+.cyber-btn:active {
+    transform: scale(0.95);
+}
+
+.cyber-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s ease;
+}
+
+.cyber-btn:hover::before,
+.cyber-btn:active::before {
+    left: 100%;
+}
+
+/* Capture Button */
+#btn-capture {
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+    animation: capture-glow 2s ease-in-out infinite;
+}
+
+@keyframes capture-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 65, 0.5); }
+    50% { box-shadow: 0 0 40px rgba(0, 255, 65, 0.8); }
+}
+
+#btn-capture:active {
+    transform: scale(0.9);
+}
+
+/* Modals */
+.cyber-modal {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+    animation: modal-appear 0.3s ease-out;
+}
+
+@keyframes modal-appear {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Hint Modal */
+#hint-modal .cyber-modal {
+    border-color: var(--cyber-yellow);
+}
+
+/* Success Modal */
+#success-modal .cyber-modal {
+    border-color: var(--cyber-green);
+}
+
+/* Menu Modal */
+#menu-modal .cyber-modal {
+    border-color: var(--cyber-blue);
+}
+
+/* Animations */
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+/* AR Object Styles */
+.ar-object {
+    position: absolute;
+    transform-style: preserve-3d;
+}
+
+.ar-label {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--cyber-green);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--cyber-green);
+    white-space: nowrap;
+    pointer-events: auto;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.ar-label:hover {
+    background: rgba(0, 255, 65, 0.2);
+    transform: scale(1.05);
+}
+
+.ar-label.selected {
+    background: rgba(0, 255, 65, 0.3);
+    border-color: var(--cyber-yellow);
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+}
+
+/* Evidence Markers */
+.evidence-marker {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--cyber-green);
+    border-radius: 50%;
+    background: rgba(0, 255, 65, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    animation: marker-pulse 2s ease-in-out infinite;
+}
+
+@keyframes marker-pulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    }
+    50% { 
+        transform: scale(1.1);
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+    }
+}
+
+/* Connection Lines */
+.connection-line {
+    position: absolute;
+    height: 2px;
+    background: linear-gradient(90deg, var(--cyber-green), transparent);
+    transform-origin: left center;
+    animation: line-flow 2s linear infinite;
+}
+
+@keyframes line-flow {
+    0% { background-position: 0 0; }
+    100% { background-position: 100px 0; }
+}
+
+/* Data Stream Effect */
+.data-stream {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--cyber-green);
+    opacity: 0.6;
+    pointer-events: none;
+    animation: stream-fall 3s linear infinite;
+}
+
+@keyframes stream-fall {
+    0% {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(100vh);
+        opacity: 0;
+    }
+}
+
+/* Hologram Effect */
+.hologram {
+    position: relative;
+}
+
+.hologram::before {
+    content: '';
+    position: absolute;
+    inset: -5px;
+    background: linear-gradient(45deg, var(--cyber-green), transparent, var(--cyber-blue));
+    border-radius: inherit;
+    opacity: 0.3;
+    animation: hologram-shift 3s linear infinite;
+    z-index: -1;
+}
+
+@keyframes hologram-shift {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Scan Line Effect */
+.scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyber-green), transparent);
+    animation: scan-move 2s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes scan-move {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+/* Glitch Text Effect */
+.glitch-text {
+    position: relative;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+}
+
+.glitch-text::before,
+.glitch-text::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch-text::before {
+    animation: glitch-anim-1 2s infinite linear alternate-reverse;
+    color: var(--cyber-red);
+    z-index: -1;
+}
+
+.glitch-text::after {
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+    color: var(--cyber-blue);
+    z-index: -2;
+}
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 0); }
+    20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, 0); }
+    40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 0); }
+    60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, 0); }
+    80% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, 0); }
+    100% { clip-path: inset(30% 0 20% 0); transform: translate(2px, 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(10% 0 60% 0); transform: translate(2px, 0); }
+    20% { clip-path: inset(80% 0 5% 0); transform: translate(-2px, 0); }
+    40% { clip-path: inset(30% 0 20% 0); transform: translate(2px, 0); }
+    60% { clip-path: inset(60% 0 10% 0); transform: translate(-2px, 0); }
+    80% { clip-path: inset(20% 0 80% 0); transform: translate(2px, 0); }
+    100% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 0); }
+}
+
+/* Responsive Adjustments */
+@media (max-height: 700px) {
+    .cyber-scan-frame {
+        padding: 4px;
+    }
+    
+    .scan-icon {
+        font-size: 3rem;
+    }
+    
+    #challenge-panel {
+        max-height: 60vh;
+        overflow-y: auto;
+    }
+}
+
+@media (max-width: 380px) {
+    .cyber-header-mobile h1 {
+        font-size: 0.875rem;
+    }
+    
+    .cyber-timer {
+        font-size: 1.25rem;
+    }
+}
+
+/* Safe Area for Notch Devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .cyber-header-mobile {
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    #ui-overlay > .fixed.bottom-0 {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* Disable Text Selection */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hardware Acceleration */
+.gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+}

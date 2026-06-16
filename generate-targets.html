@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate AR Target Images - Masta Ghimau IR Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .target-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .target-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .target-number {
+            font-size: 0.9rem;
+            color: #00ff41;
+            margin-bottom: 5px;
+        }
+
+        .target-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .target-canvas {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+        }
+
+        .generate-all-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
+        }
+
+        .generate-all-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .instructions {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 4px solid #00ff41;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .instructions h3 {
+            color: #00ff41;
+            margin-bottom: 10px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>👻 AR Target Image Generator</h1>
+        <p class="subtitle">Generate 5 target images for Masta Ghimau IR Challenge</p>
+
+        <div class="targets-grid">
+            <!-- Target 0: Ransomware -->
+            <div class="target-card">
+                <div class="target-number">Target 0</div>
+                <div class="target-title">🔒 Ransomware</div>
+                <canvas id="canvas-0" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(0)">Download</button>
+            </div>
+
+            <!-- Target 1: Phishing -->
+            <div class="target-card">
+                <div class="target-number">Target 1</div>
+                <div class="target-title">🎣 Phishing</div>
+                <canvas id="canvas-1" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(1)">Download</button>
+            </div>
+
+            <!-- Target 2: APT -->
+            <div class="target-card">
+                <div class="target-number">Target 2</div>
+                <div class="target-title">🕵️ APT</div>
+                <canvas id="canvas-2" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(2)">Download</button>
+            </div>
+
+            <!-- Target 3: DDoS -->
+            <div class="target-card">
+                <div class="target-number">Target 3</div>
+                <div class="target-title">🌐 DDoS</div>
+                <canvas id="canvas-3" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(3)">Download</button>
+            </div>
+
+            <!-- Target 4: Supply Chain -->
+            <div class="target-card">
+                <div class="target-number">Target 4</div>
+                <div class="target-title">📦 Supply Chain</div>
+                <canvas id="canvas-4" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(4)">Download</button>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="generate-all-btn" onclick="generateAll()">🎨 Generate All Targets</button>
+            <button class="generate-all-btn" onclick="downloadAll()">💾 Download All</button>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Next Steps:</h3>
+            <ol>
+                <li>Click "Generate All Targets" to create the images</li>
+                <li>Click "Download All" to save all 5 images</li>
+                <li>Go to <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/" target="_blank" style="color: #00ff41;">MindAR Compiler</a></li>
+                <li>Upload all 5 images and compile into <code>targets.mind</code></li>
+                <li>Place <code>targets.mind</code> in your project root folder</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Target configurations
+        const targets = [
+            { name: 'ransomware', title: 'RANSOMWARE', color: '#ff0040', icon: '🔒' },
+            { name: 'phishing', title: 'PHISHING', color: '#ffaa00', icon: '🎣' },
+            { name: 'apt', title: 'APT', color: '#aa00ff', icon: '🕵️' },
+            { name: 'ddos', title: 'DDoS', color: '#00aaff', icon: '🌐' },
+            { name: 'supplychain', title: 'SUPPLY CHAIN', color: '#00ff41', icon: '📦' }
+        ];
+
+        function generateTarget(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const ctx = canvas.getContext('2d');
+            const target = targets[index];
+            const size = 400;
+
+            // Clear canvas
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, size, size);
+
+            // Draw background pattern
+            drawPattern(ctx, size, target.color);
+
+            // Draw border
+            ctx.strokeStyle = target.color;
+            ctx.lineWidth = 8;
+            ctx.strokeRect(20, 20, size - 40, size - 40);
+
+            // Draw inner border
+            ctx.strokeStyle = target.color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([10, 10]);
+            ctx.strokeRect(40, 40, size - 80, size - 80);
+            ctx.setLineDash([]);
+
+            // Draw corner markers (for AR tracking)
+            drawCornerMarkers(ctx, size, target.color);
+
+            // Draw icon
+            ctx.font = '80px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(target.icon, size / 2, size / 2 - 30);
+
+            // Draw title
+            ctx.font = 'bold 30px Arial';
+            ctx.fillStyle = '#fff';
+            ctx.fillText(target.title, size / 2, size / 2 + 60);
+
+            // Draw target number
+            ctx.font = 'bold 20px Arial';
+            ctx.fillStyle = target.color;
+            ctx.fillText(`TARGET ${index}`, size / 2, size / 2 + 100);
+
+            // Draw decorative elements
+            drawDecorations(ctx, size, target.color, index);
+        }
+
+        function drawPattern(ctx, size, color) {
+            // Draw grid pattern
+            ctx.strokeStyle = color + '20';
+            ctx.lineWidth = 1;
+
+            for (let i = 0; i < size; i += 20) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, size);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(size, i);
+                ctx.stroke();
+            }
+
+            // Draw random dots for feature points
+            ctx.fillStyle = color + '40';
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * size;
+                const y = Math.random() * size;
+                const r = Math.random() * 3 + 1;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawCornerMarkers(ctx, size, color) {
+            const markerSize = 30;
+            const offset = 30;
+
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 4;
+
+            // Top-left
+            ctx.beginPath();
+            ctx.moveTo(offset, offset + markerSize);
+            ctx.lineTo(offset, offset);
+            ctx.lineTo(offset + markerSize, offset);
+            ctx.stroke();
+
+            // Top-right
+            ctx.beginPath();
+            ctx.moveTo(size - offset - markerSize, offset);
+            ctx.lineTo(size - offset, offset);
+            ctx.lineTo(size - offset, offset + markerSize);
+            ctx.stroke();
+
+            // Bottom-left
+            ctx.beginPath();
+            ctx.moveTo(offset, size - offset - markerSize);
+            ctx.lineTo(offset, size - offset);
+            ctx.lineTo(offset + markerSize, size - offset);
+            ctx.stroke();
+
+            // Bottom-right
+            ctx.beginPath();
+            ctx.moveTo(size - offset - markerSize, size - offset);
+            ctx.lineTo(size - offset, size - offset);
+            ctx.lineTo(size - offset, size - offset - markerSize);
+            ctx.stroke();
+        }
+
+        function drawDecorations(ctx, size, color, index) {
+            // Draw unique pattern for each target
+            ctx.strokeStyle = color + '60';
+            ctx.lineWidth = 2;
+
+            const centerX = size / 2;
+            const centerY = size / 2;
+
+            // Draw different geometric shapes based on index
+            switch (index) {
+                case 0: // Ransomware - Lock shape
+                    drawLockShape(ctx, centerX, centerY - 80, 30);
+                    break;
+                case 1: // Phishing - Hook shape
+                    drawHookShape(ctx, centerX, centerY - 80, 30);
+                    break;
+                case 2: // APT - Spy shape
+                    drawSpyShape(ctx, centerX, centerY - 80, 30);
+                    break;
+                case 3: // DDoS - Network shape
+                    drawNetworkShape(ctx, centerX, centerY - 80, 30);
+                    break;
+                case 4: // Supply Chain - Chain shape
+                    drawChainShape(ctx, centerX, centerY - 80, 30);
+                    break;
+            }
+        }
+
+        function drawLockShape(ctx, x, y, size) {
+            ctx.strokeStyle = '#ff0040';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y - size/2, size/2, Math.PI, 0);
+            ctx.stroke();
+            ctx.strokeRect(x - size/2, y, size, size * 0.8);
+        }
+
+        function drawHookShape(ctx, x, y, size) {
+            ctx.strokeStyle = '#ffaa00';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, size/2, 0, Math.PI * 1.5);
+            ctx.lineTo(x + size/2, y - size);
+            ctx.stroke();
+        }
+
+        function drawSpyShape(ctx, x, y, size) {
+            ctx.strokeStyle = '#aa00ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x, y, size/2, 0, Math.PI * 2);
+            ctx.moveTo(x - size, y);
+            ctx.lineTo(x + size, y);
+            ctx.stroke();
+        }
+
+        function drawNetworkShape(ctx, x, y, size) {
+            ctx.strokeStyle = '#00aaff';
+            ctx.lineWidth = 3;
+            const nodes = [
+                {x: x, y: y - size},
+                {x: x - size, y: y + size/2},
+                {x: x + size, y: y + size/2}
+            ];
+            ctx.beginPath();
+            nodes.forEach((node, i) => {
+                nodes.forEach((other, j) => {
+                    if (i < j) {
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(other.x, other.y);
+                    }
+                });
+            });
+            ctx.stroke();
+        }
+
+        function drawChainShape(ctx, x, y, size) {
+            ctx.strokeStyle = '#00ff41';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(x - size/2, y, size/3, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + size/2, y, size/3, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function generateAll() {
+            for (let i = 0; i < 5; i++) {
+                generateTarget(i);
+            }
+        }
+
+        function downloadTarget(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const link = document.createElement('a');
+            link.download = `target_${index}_${targets[index].name}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAll() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => downloadTarget(i), i * 500);
+            }
+        }
+
+        // Generate on page load
+        window.onload = generateAll;
+    </script>
+</body>
+</html>

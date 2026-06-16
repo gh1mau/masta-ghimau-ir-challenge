@@ -1,0 +1,12 @@
+{
+  "name": "masta-ghimau-ir-challenge",
+  "version": "1.0.0",
+  "description": "**AR-Based Cyber Incident Response Training Platform**",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
