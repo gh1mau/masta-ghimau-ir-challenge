@@ -94,7 +94,7 @@ class UIManager {
                 height: 100vh !important;
                 z-index: 9999 !important;
                 background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%) !important;
-                padding: 0 !important;
+                padding: 10px !important;
                 margin: 0 !important;
                 overflow-y: auto !important;
                 box-sizing: border-box !important;
@@ -105,94 +105,98 @@ class UIManager {
         // Calculate progress percentage
         const progressPercent = ((currentIndex + 1) / totalQuestions) * 100;
 
-        // Clear panel and create new professional layout - FULL HEIGHT
+        // Clear panel and create compact layout - OPTIMIZED FOR MOBILE
         panel.innerHTML = `
             <div style="
-                max-width: 800px;
+                max-width: 900px;
                 margin: 0 auto;
-                padding: 15px 20px;
-                min-height: 100vh;
+                padding: 10px;
+                min-height: calc(100vh - 20px);
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-start;
                 box-sizing: border-box;
             ">
-                <!-- Header with Progress -->
+                <!-- Header with Progress - COMPACT -->
                 <div style="
                     background: rgba(0, 255, 255, 0.05);
                     border: 1px solid rgba(0, 255, 255, 0.2);
-                    border-radius: 16px;
-                    padding: 20px 25px;
-                    margin-bottom: 30px;
+                    border-radius: 12px;
+                    padding: 12px 16px;
+                    margin-bottom: 15px;
+                    flex-shrink: 0;
                 ">
                     <div style="
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
-                        margin-bottom: 12px;
+                        margin-bottom: 8px;
                     ">
-                        <span style="color: #00ffff; font-size: 14px; font-weight: 600; letter-spacing: 1px;">QUESTION ${currentIndex + 1} OF ${totalQuestions}</span>
-                        <span style="color: #00ff41; font-size: 14px; font-weight: 600;">${Math.round(progressPercent)}%</span>
+                        <span style="color: #00ffff; font-size: 12px; font-weight: 600; letter-spacing: 1px;">QUESTION ${currentIndex + 1} OF ${totalQuestions}</span>
+                        <span style="color: #00ff41; font-size: 12px; font-weight: 600;">${Math.round(progressPercent)}%</span>
                     </div>
                     <!-- Progress Bar -->
                     <div style="
                         width: 100%;
-                        height: 6px;
+                        height: 4px;
                         background: rgba(0, 255, 255, 0.1);
-                        border-radius: 3px;
+                        border-radius: 2px;
                         overflow: hidden;
                     ">
                         <div style="
                             width: ${progressPercent}%;
                             height: 100%;
                             background: linear-gradient(90deg, #00ffff, #00ff41);
-                            border-radius: 3px;
+                            border-radius: 2px;
                             transition: width 0.5s ease;
                         "></div>
                     </div>
                 </div>
 
-                <!-- Question Card -->
+                <!-- Question Card - COMPACT -->
                 <div style="
                     background: linear-gradient(135deg, rgba(0, 20, 40, 0.9) 0%, rgba(0, 30, 60, 0.9) 100%);
                     border: 2px solid rgba(0, 255, 255, 0.3);
-                    border-radius: 20px;
-                    padding: 35px;
-                    margin-bottom: 30px;
-                    box-shadow: 0 10px 40px rgba(0, 255, 255, 0.1);
+                    border-radius: 16px;
+                    padding: 20px;
+                    margin-bottom: 15px;
+                    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.1);
+                    flex-shrink: 0;
                 ">
                     <div id="quiz-question-text" style="
                         color: #ffffff;
-                        font-size: 22px;
-                        line-height: 1.7;
+                        font-size: 18px;
+                        line-height: 1.5;
                         font-family: 'Inter', sans-serif;
                         font-weight: 500;
                     ">${question}</div>
                 </div>
 
-                <!-- Options Container -->
+                <!-- Options Container - COMPACT -->
                 <div id="quiz-options-container" style="
                     display: flex;
                     flex-direction: column;
-                    gap: 15px;
+                    gap: 10px;
+                    flex: 1;
                 "></div>
 
-                <!-- Explanation Container (hidden by default) -->
+                <!-- Explanation Container (hidden by default) - COMPACT -->
                 <div id="explanation-container" style="
                     display: none;
-                    margin-top: 25px;
-                    padding: 20px 25px;
+                    margin-top: 15px;
+                    padding: 15px;
                     background: rgba(0, 255, 65, 0.1);
                     border: 1px solid rgba(0, 255, 65, 0.3);
-                    border-radius: 12px;
+                    border-radius: 10px;
+                    flex-shrink: 0;
                 ">
-                    <div style="color: #00ff41; font-size: 14px; font-weight: 600; margin-bottom: 8px;">✓ Correct Answer</div>
-                    <div id="explanation-text" style="color: #ffffff; font-size: 15px; line-height: 1.6;"></div>
+                    <div style="color: #00ff41; font-size: 13px; font-weight: 600; margin-bottom: 6px;">✓ Correct Answer</div>
+                    <div id="explanation-text" style="color: #ffffff; font-size: 14px; line-height: 1.5;"></div>
                 </div>
             </div>
         `;
 
-        // Populate options
+        // Populate options - COMPACT BUTTONS
         const optionsContainer = document.getElementById('quiz-options-container');
         if (optionsContainer && options && options.length > 0) {
             options.forEach((opt, idx) => {
@@ -202,13 +206,14 @@ class UIManager {
                     display: flex;
                     align-items: center;
                     width: 100%;
-                    padding: 22px 25px;
+                    padding: 14px 16px;
                     background: rgba(255, 255, 255, 0.03);
                     border: 2px solid rgba(0, 255, 255, 0.2);
-                    border-radius: 14px;
+                    border-radius: 12px;
                     cursor: pointer;
-                    transition: all 0.25s ease;
+                    transition: all 0.2s ease;
                     text-align: left;
+                    flex-shrink: 0;
                 `;
 
                 // Hover effect via JS since we're setting inline styles
@@ -216,8 +221,8 @@ class UIManager {
                     if (!btn.disabled) {
                         btn.style.background = 'rgba(0, 255, 255, 0.1)';
                         btn.style.borderColor = 'rgba(0, 255, 255, 0.5)';
-                        btn.style.transform = 'translateY(-2px)';
-                        btn.style.boxShadow = '0 8px 25px rgba(0, 255, 255, 0.15)';
+                        btn.style.transform = 'translateY(-1px)';
+                        btn.style.boxShadow = '0 4px 15px rgba(0, 255, 255, 0.15)';
                     }
                 };
                 btn.onmouseleave = () => {
@@ -231,25 +236,25 @@ class UIManager {
 
                 btn.innerHTML = `
                     <span style="
-                        width: 44px;
-                        height: 44px;
+                        width: 36px;
+                        height: 36px;
                         background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 255, 255, 0.1) 100%);
                         border: 2px solid rgba(0, 255, 255, 0.4);
-                        border-radius: 12px;
+                        border-radius: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: #00ffff;
                         font-weight: 700;
-                        font-size: 18px;
-                        margin-right: 18px;
+                        font-size: 16px;
+                        margin-right: 12px;
                         flex-shrink: 0;
-                        transition: all 0.25s ease;
+                        transition: all 0.2s ease;
                     ">${String.fromCharCode(65 + idx)}</span>
                     <span style="
                         color: #e0e0e0;
-                        font-size: 17px;
-                        line-height: 1.5;
+                        font-size: 15px;
+                        line-height: 1.4;
                         font-family: 'Inter', sans-serif;
                         flex: 1;
                         font-weight: 400;

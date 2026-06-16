@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masta Ghimau IR Challenge | Live Leaderboard</title>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f2e;
+            --border: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --accent: #00d4ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+        }
+        
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, #1a202c 100%);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .session-code {
+            display: inline-block;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--accent);
+            margin-top: 10px;
+        }
+        
+        /* Status */
+        .status {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* Leaderboard */
+        .leaderboard-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .leaderboard-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .leaderboard-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .live-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--success);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+        
+        .live-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .leaderboard-list {
+            padding: 10px;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .leaderboard-item:hover {
+            border-color: var(--accent);
+            transform: translateX(4px);
+        }
+        
+        .rank {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+        
+        .rank.top {
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            color: #000;
+        }
+        
+        .participant-info {
+            flex: 1;
+        }
+        
+        .participant-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .participant-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        .participant-score {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .empty-state-text {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-hint {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 4px;
+        }
+        
+        /* Debug Panel */
+        .debug-panel {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+        }
+        
+        .debug-title {
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        
+        .debug-log {
+            color: var(--accent);
+            line-height: 1.6;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .debug-log .error {
+            color: var(--danger);
+        }
+        
+        .debug-log .success {
+            color: var(--success);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .participant-name {
+                font-size: 14px;
+            }
+            
+            .participant-score {
+                font-size: 16px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏆 Live Leaderboard</h1>
+            <p>Masta Ghimau IR Challenge</p>
+            <div class="session-code" id="session-code">Session: Loading...</div>
+        </div>
+        
+        <!-- Status -->
+        <div class="status">
+            <div class="status-indicator">
+                <div class="status-dot"></div>
+                <span id="status-text">Connecting to Firebase...</span>
+            </div>
+        </div>
+        
+        <!-- Leaderboard -->
+        <div class="leaderboard-container">
+            <div class="leaderboard-header">
+                <span class="leaderboard-title">Top Players</span>
+                <span class="live-badge">Live</span>
+            </div>
+            <div class="leaderboard-list" id="leaderboard">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👻</div>
+                    <div class="empty-state-text">Waiting for players...</div>
+                    <div class="empty-state-hint">Scan the QR code to join!</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="stat-players">0</div>
+                <div class="stat-label">Players</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-avg">0</div>
+                <div class="stat-label">Avg Score</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-high">0</div>
+                <div class="stat-label">High Score</div>
+            </div>
+        </div>
+        
+        <!-- Debug Panel -->
+        <div class="debug-panel">
+            <div class="debug-title">Debug Log</div>
+            <div class="debug-log" id="debug-log">
+                Initializing leaderboard...
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            © 2024 Hussein Mohamed masta ghimau | 
+            <a href="https://www.youtube.com/@mastaghimau" target="_blank">YouTube</a> | 
+            <a href="https://github.com/gh1mau" target="_blank">GitHub</a>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyANKcGHcyyXKS3mny7jOEn8sjWbNhL1Ilc",
+            authDomain: "masta-ghimau-ir-challenge.firebaseapp.com",
+            databaseURL: "https://masta-ghimau-ir-challenge-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "masta-ghimau-ir-challenge",
+            storageBucket: "masta-ghimau-ir-challenge.firebasestorage.app",
+            messagingSenderId: "1073985887858",
+            appId: "1:1073985887858:web:16e21e1419ee66efbeeceb",
+            measurementId: "G-K5508CP1CC"
+        };
+        
+        // Debug logger
+        function log(message, type = 'info') {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const line = document.createElement('div');
+            line.className = type;
+            line.textContent = `[${timestamp}] ${message}`;
+            debugLog.appendChild(line);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        // Initialize Firebase
+        let app, database;
+        let currentSession = null;
+        let unsubscribe = null;
+        
+        function init() {
+            log('Initializing Firebase...');
+            
+            try {
+                app = initializeApp(firebaseConfig);
+                database = getDatabase(app);
+                log('✓ Firebase initialized successfully', 'success');
+                
+                // Get session from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                currentSession = urlParams.get('session') || localStorage.getItem('mastaGhimau_sessionId') || 'default_session';
+                
+                document.getElementById('session-code').textContent = `Session: ${currentSession}`;
+                log(`Session: ${currentSession}`);
+                
+                // Start listening
+                startListening();
+                
+            } catch (error) {
+                log(`✗ Firebase init error: ${error.message}`, 'error');
+                document.getElementById('status-text').textContent = 'Firebase Error';
+            }
+        }
+        
+        function startListening() {
+            if (!database || !currentSession) {
+                log('Cannot start listening - missing database or session', 'error');
+                return;
+            }
+            
+            log(`Starting listener for session: ${currentSession}`);
+            document.getElementById('status-text').textContent = 'Connected - Listening for updates...';
+            
+            const sessionRef = ref(database, `sessions/${currentSession}/players`);
+            
+            unsubscribe = onValue(sessionRef, (snapshot) => {
+                const data = snapshot.val();
+                log(`Data received: ${data ? Object.keys(data).length : 0} players`);
+                
+                if (data) {
+                    const players = Object.entries(data)
+                        .map(([id, player]) => ({ id, ...player }))
+                        .sort((a, b) => b.score - a.score);
+                    
+                    updateLeaderboard(players);
+                } else {
+                    updateLeaderboard([]);
+                }
+            }, (error) => {
+                log(`Listener error: ${error.message}`, 'error');
+                document.getElementById('status-text').textContent = 'Connection Error';
+            });
+        }
+        
+        function updateLeaderboard(players) {
+            const container = document.getElementById('leaderboard');
+            
+            // Update stats
+            document.getElementById('stat-players').textContent = players.length;
+            
+            if (players.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👻</div>
+                        <div class="empty-state-text">Waiting for players...</div>
+                        <div class="empty-state-hint">Scan the QR code to join!</div>
+                    </div>
+                `;
+                document.getElementById('stat-avg').textContent = '0';
+                document.getElementById('stat-high').textContent = '0';
+                return;
+            }
+            
+            // Calculate stats
+            const totalScore = players.reduce((sum, p) => sum + (p.score || 0), 0);
+            const avgScore = Math.round(totalScore / players.length);
+            const highScore = players[0]?.score || 0;
+            
+            document.getElementById('stat-avg').textContent = avgScore;
+            document.getElementById('stat-high').textContent = highScore;
+            
+            // Render leaderboard
+            let html = '';
+            players.slice(0, 10).forEach((player, index) => {
+                const rankClass = index < 3 ? 'top' : '';
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                const joinTime = player.joinedAt ? new Date(player.joinedAt).toLocaleTimeString() : 'Unknown';
+                
+                html += `
+                    <div class="leaderboard-item">
+                        <div class="rank ${rankClass}">${rankEmoji}</div>
+                        <div class="participant-info">
+                            <div class="participant-name">${escapeHtml(player.name || 'Unknown')}</div>
+                            <div class="participant-time">Joined at ${joinTime}</div>
+                        </div>
+                        <div class="participant-score">${player.score || 0}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            log(`Leaderboard updated: ${players.length} players`);
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribe) {
+                unsubscribe();
+                log('Unsubscribed from updates');
+            }
+        });
+        
+        // Start
+        init();
+    </script>
+</body>
+</html>
