@@ -189,60 +189,94 @@ class AREngine {
     }
 
     createScenarioMesh(type) {
-        const configs = {
-            ransomware: {
-                geometry: () => new THREE.BoxGeometry(0.4, 0.5, 0.2),
-                material: () => new THREE.MeshPhongMaterial({
-                    color: 0xff0040,
-                    emissive: 0x440000
-                }),
-                position: { x: 0, y: 0.25, z: 0 }
-            },
-            phishing: {
-                geometry: () => new THREE.BoxGeometry(0.5, 0.35, 0.1),
-                material: () => new THREE.MeshPhongMaterial({ color: 0x00aaff }),
-                position: { x: 0, y: 0.2, z: 0 }
-            },
-            apt: {
-                geometry: () => new THREE.SphereGeometry(0.25, 32, 32),
-                material: () => new THREE.MeshPhongMaterial({ color: 0xffaa00 }),
-                position: { x: 0, y: 0.25, z: 0 }
-            },
-            'insider-threat': {
-                geometry: () => new THREE.CapsuleGeometry(0.15, 0.4, 4, 8),
-                material: () => new THREE.MeshPhongMaterial({ color: 0xff6600 }),
-                position: { x: 0, y: 0.3, z: 0 }
-            },
-            'malware-analysis': {
-                geometry: () => new THREE.IcosahedronGeometry(0.25, 0),
-                material: () => new THREE.MeshPhongMaterial({ color: 0x9900ff }),
-                position: { x: 0, y: 0.25, z: 0 }
-            },
-            ddos: {
-                geometry: () => new THREE.TorusKnotGeometry(0.2, 0.05, 64, 8),
-                material: () => new THREE.MeshPhongMaterial({ color: 0xff0000 }),
-                position: { x: 0, y: 0.25, z: 0 }
-            },
-            supplychain: {
-                geometry: () => new THREE.CylinderGeometry(0.1, 0.1, 0.6, 16),
-                material: () => new THREE.MeshPhongMaterial({ color: 0x00ff88 }),
-                position: { x: 0, y: 0.3, z: 0 }
-            },
-            infostealer: {
-                geometry: () => new THREE.OctahedronGeometry(0.25),
-                material: () => new THREE.MeshPhongMaterial({ color: 0xff00ff }),
-                position: { x: 0, y: 0.25, z: 0 }
-            }
-        };
+        // Create a cute ghost for all scenarios (Mistik theme)
+        return this.createCuteGhost(type);
+    }
 
-        const config = configs[type] || configs['ransomware'];
-        const geometry = this.getGeometry(`geo_${type}`, config.geometry);
-        const material = this.getMaterial(`mat_${type}`, config.material);
+    createCuteGhost(type) {
+        const ghostGroup = new THREE.Group();
 
-        const mesh = new THREE.Mesh(geometry, material);
-        mesh.position.set(config.position.x, config.position.y, config.position.z);
+        // Ghost body - white semi-transparent sphere
+        const bodyGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+        const bodyMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.9,
+            emissive: 0x222222
+        });
+        const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+        body.scale.y = 1.3; // Stretch to make it ghost-like
+        ghostGroup.add(body);
 
-        return mesh;
+        // Ghost tail - cone shape at bottom
+        const tailGeometry = new THREE.ConeGeometry(0.25, 0.4, 32, 1, true);
+        const tailMaterial = new THREE.MeshPhongMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.8
+        });
+        const tail = new THREE.Mesh(tailGeometry, tailMaterial);
+        tail.position.y = -0.35;
+        ghostGroup.add(tail);
+
+        // Left eye
+        const eyeGeometry = new THREE.SphereGeometry(0.06, 16, 16);
+        const eyeMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        leftEye.position.set(-0.1, 0.1, 0.25);
+        ghostGroup.add(leftEye);
+
+        // Right eye
+        const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+        rightEye.position.set(0.1, 0.1, 0.25);
+        ghostGroup.add(rightEye);
+
+        // Cute blush on cheeks
+        const blushGeometry = new THREE.SphereGeometry(0.04, 16, 16);
+        const blushMaterial = new THREE.MeshBasicMaterial({
+            color: 0xffaaaa,
+            transparent: true,
+            opacity: 0.6
+        });
+        const leftBlush = new THREE.Mesh(blushGeometry, blushMaterial);
+        leftBlush.position.set(-0.15, 0.02, 0.22);
+        ghostGroup.add(leftBlush);
+
+        const rightBlush = new THREE.Mesh(blushGeometry, blushMaterial);
+        rightBlush.position.set(0.15, 0.02, 0.22);
+        ghostGroup.add(rightBlush);
+
+        // Small mouth (smile)
+        const mouthGeometry = new THREE.TorusGeometry(0.03, 0.01, 8, 16, Math.PI);
+        const mouthMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        const mouth = new THREE.Mesh(mouthGeometry, mouthMaterial);
+        mouth.position.set(0, -0.05, 0.26);
+        mouth.rotation.x = Math.PI; // Flip to make smile
+        ghostGroup.add(mouth);
+
+        // Ghost glow effect
+        const glowGeometry = new THREE.SphereGeometry(0.4, 32, 32);
+        const glowMaterial = new THREE.MeshBasicMaterial({
+            color: 0x88ccff,
+            transparent: true,
+            opacity: 0.2
+        });
+        const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+        glow.position.y = 0;
+        ghostGroup.add(glow);
+
+        // Position the ghost
+        ghostGroup.position.set(0, 0.3, 0);
+
+        // Register animations for the ghost
+        // Floating animation
+        this.registerAnimation(ghostGroup, 'float', { speed: 0.002, amplitude: 0.1 });
+        // Gentle rotation
+        this.registerAnimation(ghostGroup, 'rotate', { speed: 0.005, axis: 'y' });
+        // Glow pulse
+        this.registerAnimation(glow, 'pulse', { speed: 0.003 });
+
+        return ghostGroup;
     }
 
     /**
@@ -262,6 +296,8 @@ class AREngine {
      * Centralized update loop - SINGLE SOURCE OF TRUTH
      */
     update(deltaTime) {
+        const now = Date.now();
+
         // Update all registered animations
         this.animatedObjects.forEach(item => {
             if (!item.object) return;
@@ -271,11 +307,13 @@ class AREngine {
                     item.object.rotation[item.axis] += item.speed * deltaTime * 60;
                     break;
                 case 'pulse':
-                    const scale = 1 + Math.sin(Date.now() * item.speed) * 0.1;
-                    item.object.scale.setScalar(scale);
+                    const pulseScale = 1 + Math.sin(now * item.speed) * 0.15;
+                    item.object.scale.setScalar(pulseScale);
                     break;
                 case 'float':
-                    item.object.position.y += Math.sin(Date.now() * item.speed) * 0.001;
+                    // Smooth floating animation using sine wave
+                    const floatOffset = Math.sin(now * item.speed) * (item.amplitude || 0.05);
+                    item.object.position.y = 0.3 + floatOffset;
                     break;
             }
         });
