@@ -279,18 +279,22 @@ class AREngine {
 
     loadGLBModel(url) {
         return new Promise((resolve, reject) => {
+            console.log('Loading GLB model from:', url);
             const loader = new GLTFLoader();
             loader.load(
                 url,
                 (gltf) => {
+                    console.log('GLB model loaded successfully:', url);
                     logger.info('GLB model loaded successfully', { url });
                     resolve(gltf.scene);
                 },
                 (progress) => {
                     const percent = Math.round((progress.loaded / progress.total) * 100);
+                    console.log(`Loading GLB: ${percent}%`);
                     logger.info(`Loading GLB: ${percent}%`);
                 },
                 (error) => {
+                    console.error('Failed to load GLB model:', error);
                     logger.error('Failed to load GLB model', { error: error.message });
                     reject(error);
                 }
