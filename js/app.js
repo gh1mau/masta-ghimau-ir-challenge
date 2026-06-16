@@ -88,20 +88,30 @@ class IRChallengeApp {
                 this.sessionCode = localStorage.getItem('mastaGhimau_sessionId') || this.challengeId;
             }
 
-            console.log('Challenge joining session:', this.sessionCode, 'as player:', nickname);
+            console.log('========================================');
+            console.log('CHALLENGE PAGE JOINING SESSION');
+            console.log('Session Code:', this.sessionCode);
+            console.log('Player Name:', nickname);
+            console.log('Challenge ID:', this.challengeId);
+            console.log('Firebase Initialized:', this.firebaseInitialized);
+            console.log('========================================');
 
             // Join leaderboard session
             if (this.firebaseInitialized) {
+                console.log('Attempting to join leaderboard session...');
                 const joined = await leaderboardManager.joinSession(this.sessionCode, nickname);
                 if (joined) {
                     logger.info('Joined leaderboard session', { session: this.sessionCode, player: nickname });
-                    console.log('Successfully joined leaderboard session:', this.sessionCode);
+                    console.log('✓ Successfully joined leaderboard session:', this.sessionCode);
 
                     // Start listening for leaderboard updates
+                    console.log('Starting leaderboard listener...');
                     this.startLeaderboardListener();
                 } else {
-                    console.warn('Failed to join leaderboard session');
+                    console.error('✗ Failed to join leaderboard session');
                 }
+            } else {
+                console.warn('Firebase not initialized, skipping leaderboard join');
             }
 
             // Initialize AR after nickname entry
@@ -110,20 +120,27 @@ class IRChallengeApp {
     }
 
     startLeaderboardListener() {
-        if (!this.firebaseInitialized) return;
+        if (!this.firebaseInitialized) {
+            console.warn('Cannot start leaderboard listener: Firebase not initialized');
+            return;
+        }
+
+        console.log('Starting leaderboard listener in challenge page...');
+        console.log('Current session:', leaderboardManager.currentSession);
+        console.log('Player ID:', leaderboardManager.playerId);
 
         // Store unsubscribe function so we can clean up later
         this.leaderboardUnsubscribe = leaderboardManager.onLeaderboardUpdate((players) => {
+            console.log('Challenge page received leaderboard update:', players.length, 'players');
+            
             // Store data for completion screen
             uiManager.leaderboardData = players;
             uiManager.currentPlayerId = leaderboardManager.playerId;
-
-            // Update UI if on presenter page
-            if (window.location.pathname.includes('presenter.html')) {
-                uiManager.showLeaderboard();
-                uiManager.updateLeaderboard(players, leaderboardManager.playerId);
-            }
+            
+            console.log('Leaderboard data stored in uiManager:', uiManager.leaderboardData);
         });
+        
+        console.log('Leaderboard listener started successfully');
     }
 
     async updateLeaderboardScore(points) {
@@ -327,25 +344,10 @@ class IRChallengeApp {
             this.arEngine.playSound('ghostAppear');
         }
 
-        // Show fullscreen AR model for 5 seconds
-        let countdown = 5;
-        uiManager.showFullscreenAR(countdown);
-
-        this.countdownInterval = setInterval(() => {
-            countdown--;
-
-            if (countdown > 0) {
-                uiManager.updateFullscreenARCountdown(countdown);
-                if (this.arEngine) {
-                    this.arEngine.playSound('countdown');
-                }
-            } else {
-                this.clearAllIntervals();
-                uiManager.hideFullscreenAR();
-                // Now show challenge info box
-                this.showChallengeInfoBox();
-            }
-        }, 1000);
+        // Wait 5 seconds then show challenge info (no countdown display)
+        setTimeout(() => {
+            this.showChallengeInfoBox();
+        }, 5000);
     }
 
     showChallengeInfoBox() {

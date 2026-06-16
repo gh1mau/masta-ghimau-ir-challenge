@@ -103,19 +103,27 @@ class LeaderboardManager {
    */
   async updateScore(score) {
     if (!firebaseInitialized || !database || !this.currentSession || !this.playerId) {
+      console.warn('Cannot update score: Firebase not ready or no session/player');
+      console.log('  - firebaseInitialized:', firebaseInitialized);
+      console.log('  - database:', !!database);
+      console.log('  - currentSession:', this.currentSession);
+      console.log('  - playerId:', this.playerId);
       return false;
     }
 
     try {
+      console.log('Updating score in Firebase:', score, 'for session:', this.currentSession, 'player:', this.playerId);
       const playerRef = ref(database, `sessions/${this.currentSession}/players/${this.playerId}`);
       await update(playerRef, {
         score: score,
         lastActive: Date.now()
       });
 
+      console.log('✓ Score updated successfully:', score);
       logger.info("Score updated", { score });
       return true;
     } catch (error) {
+      console.error('✗ Failed to update score:', error.message);
       logger.error("Failed to update score", { error: error.message });
       return false;
     }
@@ -161,20 +169,23 @@ class LeaderboardManager {
    * Start Firebase listener (internal)
    */
   startFirebaseListener() {
+    // Always restart listener if session changed
     if (this.unsubscribe) {
-      // Already listening
-      return;
+      console.log('Restarting Firebase listener for new session:', this.currentSession);
+      this.unsubscribe();
+      this.unsubscribe = null;
     }
 
     // Use current session or default to 'default_session'
     const sessionToListen = this.currentSession || 'default_session';
     console.log('Starting Firebase listener for session:', sessionToListen);
+    console.log('Current callbacks count:', this.callbacks.size);
 
     const sessionRef = ref(database, `sessions/${sessionToListen}/players`);
 
     this.unsubscribe = onValue(sessionRef, (snapshot) => {
       const data = snapshot.val();
-      console.log('Firebase data received:', data);
+      console.log('Firebase data received for session', sessionToListen, ':', data);
 
       let players = [];
       if (data) {
@@ -184,12 +195,16 @@ class LeaderboardManager {
           .slice(0, 10); // Top 10 only
       }
 
+      console.log('Processed players:', players.length, 'players');
+
       // Cache the data
       this.lastPlayersData = players;
 
       // Notify all callbacks
-      this.callbacks.forEach(callback => {
+      console.log('Notifying', this.callbacks.size, 'callbacks');
+      this.callbacks.forEach((callback, index) => {
         try {
+          console.log('Calling callback', index);
           callback(players);
         } catch (error) {
           console.error('Error in leaderboard callback:', error);

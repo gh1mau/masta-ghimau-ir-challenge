@@ -81,70 +81,6 @@ class UIManager {
         }
     }
 
-    showFullscreenAR(countdown) {
-        // Create fullscreen AR overlay
-        let overlay = document.getElementById('fullscreen-ar-overlay');
-        if (!overlay) {
-            overlay = document.createElement('div');
-            overlay.id = 'fullscreen-ar-overlay';
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.3);
-                z-index: 1500;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                align-items: center;
-                padding-bottom: 100px;
-                pointer-events: none;
-            `;
-            document.body.appendChild(overlay);
-        }
-
-        overlay.innerHTML = `
-            <div style="
-                background: rgba(0, 20, 40, 0.9);
-                border: 2px solid #00ffff;
-                border-radius: 20px;
-                padding: 20px 40px;
-                text-align: center;
-                box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
-            ">
-                <div style="color: #00ffff; font-size: 14px; margin-bottom: 10px;">AR Model Display</div>
-                <div id="ar-countdown" style="
-                    color: #00ff41;
-                    font-size: 48px;
-                    font-weight: bold;
-                    font-family: 'Orbitron', sans-serif;
-                    text-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
-                ">${countdown}</div>
-            </div>
-        `;
-
-        overlay.style.display = 'flex';
-    }
-
-    updateFullscreenARCountdown(countdown) {
-        const el = document.getElementById('ar-countdown');
-        if (el) {
-            el.textContent = countdown;
-            if (countdown <= 2) {
-                el.style.color = '#ff0040';
-            }
-        }
-    }
-
-    hideFullscreenAR() {
-        const overlay = document.getElementById('fullscreen-ar-overlay');
-        if (overlay) {
-            overlay.style.display = 'none';
-        }
-    }
-
     showQuestion(question, options, onAnswer, currentIndex = 0, totalQuestions = 3) {
         // Ensure question panel is visible with proper styling
         const panel = this.elements.questionPanel;
@@ -162,44 +98,70 @@ class UIManager {
             panel.style.boxSizing = 'border-box';
         }
 
-        // Clear panel and create new layout
+        // Calculate progress percentage
+        const progressPercent = ((currentIndex + 1) / totalQuestions) * 100;
+
+        // Clear panel and create new professional layout
         panel.innerHTML = `
             <div style="
-                max-width: 600px;
+                max-width: 700px;
                 margin: 0 auto;
-                padding: 20px 0;
+                padding: 40px 20px;
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
             ">
-                <!-- Progress Bar -->
+                <!-- Header with Progress -->
                 <div style="
-                    background: rgba(0, 255, 255, 0.1);
-                    border: 1px solid #00ffff;
-                    border-radius: 10px;
-                    padding: 15px;
+                    background: rgba(0, 255, 255, 0.05);
+                    border: 1px solid rgba(0, 255, 255, 0.2);
+                    border-radius: 16px;
+                    padding: 20px 25px;
                     margin-bottom: 30px;
-                    text-align: center;
                 ">
-                    <div style="color: #00ffff; font-size: 14px; margin-bottom: 5px;">QUESTION</div>
-                    <div style="color: #00ff41; font-size: 24px; font-weight: bold;">${currentIndex + 1} / ${totalQuestions}</div>
+                    <div style="
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 12px;
+                    ">
+                        <span style="color: #00ffff; font-size: 14px; font-weight: 600; letter-spacing: 1px;">QUESTION ${currentIndex + 1} OF ${totalQuestions}</span>
+                        <span style="color: #00ff41; font-size: 14px; font-weight: 600;">${Math.round(progressPercent)}%</span>
+                    </div>
+                    <!-- Progress Bar -->
+                    <div style="
+                        width: 100%;
+                        height: 6px;
+                        background: rgba(0, 255, 255, 0.1);
+                        border-radius: 3px;
+                        overflow: hidden;
+                    ">
+                        <div style="
+                            width: ${progressPercent}%;
+                            height: 100%;
+                            background: linear-gradient(90deg, #00ffff, #00ff41);
+                            border-radius: 3px;
+                            transition: width 0.5s ease;
+                        "></div>
+                    </div>
                 </div>
 
-                <!-- Question Text -->
+                <!-- Question Card -->
                 <div style="
-                    background: rgba(0, 20, 40, 0.8);
-                    border: 2px solid #00ffff;
-                    border-radius: 15px;
-                    padding: 25px;
-                    margin-bottom: 25px;
-                    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+                    background: linear-gradient(135deg, rgba(0, 20, 40, 0.9) 0%, rgba(0, 30, 60, 0.9) 100%);
+                    border: 2px solid rgba(0, 255, 255, 0.3);
+                    border-radius: 20px;
+                    padding: 35px;
+                    margin-bottom: 30px;
+                    box-shadow: 0 10px 40px rgba(0, 255, 255, 0.1);
                 ">
                     <div id="quiz-question-text" style="
                         color: #ffffff;
-                        font-size: 20px;
-                        line-height: 1.6;
+                        font-size: 22px;
+                        line-height: 1.7;
                         font-family: 'Inter', sans-serif;
+                        font-weight: 500;
                     ">${question}</div>
                 </div>
 
@@ -207,8 +169,21 @@ class UIManager {
                 <div id="quiz-options-container" style="
                     display: flex;
                     flex-direction: column;
-                    gap: 12px;
+                    gap: 15px;
                 "></div>
+
+                <!-- Explanation Container (hidden by default) -->
+                <div id="explanation-container" style="
+                    display: none;
+                    margin-top: 25px;
+                    padding: 20px 25px;
+                    background: rgba(0, 255, 65, 0.1);
+                    border: 1px solid rgba(0, 255, 65, 0.3);
+                    border-radius: 12px;
+                ">
+                    <div style="color: #00ff41; font-size: 14px; font-weight: 600; margin-bottom: 8px;">✓ Correct Answer</div>
+                    <div id="explanation-text" style="color: #ffffff; font-size: 15px; line-height: 1.6;"></div>
+                </div>
             </div>
         `;
 
@@ -222,50 +197,57 @@ class UIManager {
                     display: flex;
                     align-items: center;
                     width: 100%;
-                    padding: 20px;
-                    background: rgba(0, 255, 255, 0.05);
-                    border: 2px solid rgba(0, 255, 255, 0.3);
-                    border-radius: 12px;
+                    padding: 22px 25px;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 2px solid rgba(0, 255, 255, 0.2);
+                    border-radius: 14px;
                     cursor: pointer;
-                    transition: all 0.3s ease;
+                    transition: all 0.25s ease;
                     text-align: left;
-                    margin-bottom: 12px;
                 `;
 
                 // Hover effect via JS since we're setting inline styles
                 btn.onmouseenter = () => {
-                    btn.style.background = 'rgba(0, 255, 255, 0.15)';
-                    btn.style.borderColor = '#00ffff';
-                    btn.style.transform = 'translateX(5px)';
+                    if (!btn.disabled) {
+                        btn.style.background = 'rgba(0, 255, 255, 0.1)';
+                        btn.style.borderColor = 'rgba(0, 255, 255, 0.5)';
+                        btn.style.transform = 'translateY(-2px)';
+                        btn.style.boxShadow = '0 8px 25px rgba(0, 255, 255, 0.15)';
+                    }
                 };
                 btn.onmouseleave = () => {
-                    btn.style.background = 'rgba(0, 255, 255, 0.05)';
-                    btn.style.borderColor = 'rgba(0, 255, 255, 0.3)';
-                    btn.style.transform = 'translateX(0)';
+                    if (!btn.disabled) {
+                        btn.style.background = 'rgba(255, 255, 255, 0.03)';
+                        btn.style.borderColor = 'rgba(0, 255, 255, 0.2)';
+                        btn.style.transform = 'translateY(0)';
+                        btn.style.boxShadow = 'none';
+                    }
                 };
 
                 btn.innerHTML = `
                     <span style="
-                        width: 36px;
-                        height: 36px;
-                        background: rgba(0, 255, 255, 0.2);
-                        border: 2px solid #00ffff;
-                        border-radius: 50%;
+                        width: 44px;
+                        height: 44px;
+                        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(0, 255, 255, 0.1) 100%);
+                        border: 2px solid rgba(0, 255, 255, 0.4);
+                        border-radius: 12px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         color: #00ffff;
-                        font-weight: bold;
-                        font-size: 16px;
-                        margin-right: 15px;
+                        font-weight: 700;
+                        font-size: 18px;
+                        margin-right: 18px;
                         flex-shrink: 0;
+                        transition: all 0.25s ease;
                     ">${String.fromCharCode(65 + idx)}</span>
                     <span style="
-                        color: #ffffff;
-                        font-size: 16px;
-                        line-height: 1.4;
+                        color: #e0e0e0;
+                        font-size: 17px;
+                        line-height: 1.5;
                         font-family: 'Inter', sans-serif;
                         flex: 1;
+                        font-weight: 400;
                     ">${opt}</span>
                 `;
 
@@ -295,34 +277,71 @@ class UIManager {
             return;
         }
 
+        // Get explanation container
+        const explanationContainer = document.getElementById('explanation-container');
+        const explanationText = document.getElementById('explanation-text');
+
         if (selectedIndex === correctIndex) {
+            // Correct answer styling
             selectedBtn.classList.add('correct');
-            selectedBtn.style.background = 'rgba(0, 255, 65, 0.3)';
+            selectedBtn.style.background = 'rgba(0, 255, 65, 0.25)';
             selectedBtn.style.borderColor = '#00ff41';
+            selectedBtn.style.boxShadow = '0 0 20px rgba(0, 255, 65, 0.3)';
+            
+            // Update explanation container for correct answer
+            if (explanationContainer) {
+                explanationContainer.style.display = 'block';
+                explanationContainer.style.background = 'rgba(0, 255, 65, 0.1)';
+                explanationContainer.style.borderColor = 'rgba(0, 255, 65, 0.4)';
+                explanationContainer.innerHTML = `
+                    <div style="color: #00ff41; font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 20px;">✓</span> Correct Answer!
+                    </div>
+                    <div style="color: #ffffff; font-size: 15px; line-height: 1.7;">${explanation || 'Well done! You selected the correct answer.'}</div>
+                `;
+            }
         } else {
+            // Wrong answer styling
             selectedBtn.classList.add('wrong');
-            selectedBtn.style.background = 'rgba(255, 0, 64, 0.3)';
+            selectedBtn.style.background = 'rgba(255, 0, 64, 0.25)';
             selectedBtn.style.borderColor = '#ff0040';
+            selectedBtn.style.boxShadow = '0 0 20px rgba(255, 0, 64, 0.3)';
             
             // Highlight correct answer
             const correctBtn = allBtns[correctIndex];
             if (correctBtn) {
                 correctBtn.classList.add('correct');
-                correctBtn.style.background = 'rgba(0, 255, 65, 0.3)';
-                correctBtn.style.borderColor = '#00ff41';
+                correctBtn.style.background = 'rgba(0, 255, 65, 0.15)';
+                correctBtn.style.borderColor = 'rgba(0, 255, 65, 0.5)';
+            }
+            
+            // Update explanation container for wrong answer
+            if (explanationContainer) {
+                explanationContainer.style.display = 'block';
+                explanationContainer.style.background = 'rgba(255, 0, 64, 0.1)';
+                explanationContainer.style.borderColor = 'rgba(255, 0, 64, 0.4)';
+                explanationContainer.innerHTML = `
+                    <div style="color: #ff0040; font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 20px;">✗</span> Incorrect Answer
+                    </div>
+                    <div style="color: #ffffff; font-size: 15px; line-height: 1.7;">${explanation || 'The correct answer is highlighted in green.'}</div>
+                `;
             }
         }
 
-        // Disable all buttons
-        allBtns.forEach(btn => {
+        // Disable all buttons and remove hover effects
+        allBtns.forEach((btn, idx) => {
             btn.disabled = true;
             btn.style.cursor = 'not-allowed';
-            btn.style.opacity = '0.7';
+            btn.onmouseenter = null;
+            btn.onmouseleave = null;
+            
+            // Dim other buttons that weren't selected
+            if (idx !== selectedIndex && idx !== correctIndex) {
+                btn.style.opacity = '0.4';
+                btn.style.transform = 'scale(0.98)';
+            }
         });
-
-        if (explanation) {
-            setTimeout(() => alert(explanation), 100);
-        }
     }
 
     showCompletion(score, rank = null) {

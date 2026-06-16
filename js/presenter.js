@@ -84,15 +84,18 @@ class PresenterApp {
 
         console.log('Presenter session:', this.currentSession);
 
-        // Set the session in leaderboard manager
+        // CRITICAL: Set the session in leaderboard manager BEFORE starting listener
         this.leaderboard.currentSession = this.currentSession;
+        console.log('Set leaderboard manager session to:', this.currentSession);
 
         // Listen for leaderboard updates (no need to join as presenter)
         this.leaderboardUnsubscribe = this.leaderboard.onLeaderboardUpdate((players) => {
-            console.log('Leaderboard updated:', players);
+            console.log('Presenter received leaderboard update:', players);
             this.updateLeaderboardDisplay(players);
             this.updateParticipantCount(players);
         });
+        
+        console.log('Presenter leaderboard listener started');
     }
 
     loadChallenge(challengeId) {
