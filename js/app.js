@@ -28,6 +28,7 @@ class IRChallengeApp {
         this.challengeShown = false;
         this.countdownInterval = null;
         this.challengeInfoInterval = null;
+        this.leaderboardUnsubscribe = null; // Store unsubscribe function
     }
 
     async init() {
@@ -111,8 +112,8 @@ class IRChallengeApp {
     startLeaderboardListener() {
         if (!this.firebaseInitialized) return;
 
-        // Listen for updates on both challenge and presenter pages
-        leaderboardManager.onLeaderboardUpdate((players) => {
+        // Store unsubscribe function so we can clean up later
+        this.leaderboardUnsubscribe = leaderboardManager.onLeaderboardUpdate((players) => {
             // Store data for completion screen
             uiManager.leaderboardData = players;
             uiManager.currentPlayerId = leaderboardManager.playerId;
@@ -568,6 +569,13 @@ class IRChallengeApp {
 
     dispose() {
         this.clearAllIntervals();
+
+        // Unsubscribe from leaderboard updates
+        if (this.leaderboardUnsubscribe) {
+            this.leaderboardUnsubscribe();
+            this.leaderboardUnsubscribe = null;
+        }
+
         if (this.arEngine) {
             this.arEngine.dispose();
             this.arEngine = null;

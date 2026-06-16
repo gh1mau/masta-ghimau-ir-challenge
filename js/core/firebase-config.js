@@ -37,6 +37,7 @@ try {
 /**
  * Leaderboard Manager Class
  * Handles real-time leaderboard functionality
+ * Supports multiple listeners (presenter + challenge pages)
  */
 class LeaderboardManager {
   constructor() {
@@ -45,6 +46,8 @@ class LeaderboardManager {
     this.playerName = null;
     this.unsubscribe = null;
     this.heartbeatInterval = null;
+    this.callbacks = new Set(); // Support multiple listeners
+    this.lastPlayersData = null; // Cache last data for new listeners
   }
 
   /**
@@ -120,41 +123,87 @@ class LeaderboardManager {
 
   /**
    * Listen for leaderboard updates
+   * Supports multiple listeners (presenter + challenge pages)
    * @param {Function} callback - Function to call with updated player list
+   * @returns {Function} - Unsubscribe function
    */
   onLeaderboardUpdate(callback) {
     if (!firebaseInitialized || !database) {
       logger.warn('Cannot listen for updates, Firebase not available');
+      return () => {};
+    }
+
+    // Add callback to set
+    this.callbacks.add(callback);
+    console.log('Added leaderboard listener, total listeners:', this.callbacks.size);
+
+    // If we have cached data, immediately call the callback
+    if (this.lastPlayersData) {
+      callback(this.lastPlayersData);
+    }
+
+    // Start Firebase listener if not already started
+    this.startFirebaseListener();
+
+    // Return unsubscribe function
+    return () => {
+      this.callbacks.delete(callback);
+      console.log('Removed leaderboard listener, remaining:', this.callbacks.size);
+      // Only stop Firebase listener if no more callbacks
+      if (this.callbacks.size === 0 && this.unsubscribe) {
+        this.unsubscribe();
+        this.unsubscribe = null;
+      }
+    };
+  }
+
+  /**
+   * Start Firebase listener (internal)
+   */
+  startFirebaseListener() {
+    if (this.unsubscribe) {
+      // Already listening
       return;
     }
 
     // Use current session or default to 'default_session'
     const sessionToListen = this.currentSession || 'default_session';
-    console.log('Listening to session:', sessionToListen);
+    console.log('Starting Firebase listener for session:', sessionToListen);
 
     const sessionRef = ref(database, `sessions/${sessionToListen}/players`);
 
-    // Unsubscribe from previous listener if exists
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-
     this.unsubscribe = onValue(sessionRef, (snapshot) => {
       const data = snapshot.val();
-      console.log('Leaderboard data received:', data);
+      console.log('Firebase data received:', data);
+
+      let players = [];
       if (data) {
-        const players = Object.entries(data)
+        players = Object.entries(data)
           .map(([id, player]) => ({ id, ...player }))
           .sort((a, b) => b.score - a.score)
           .slice(0, 10); // Top 10 only
-
-        callback(players);
-      } else {
-        callback([]);
       }
+
+      // Cache the data
+      this.lastPlayersData = players;
+
+      // Notify all callbacks
+      this.callbacks.forEach(callback => {
+        try {
+          callback(players);
+        } catch (error) {
+          console.error('Error in leaderboard callback:', error);
+        }
+      });
     }, (error) => {
       console.error('Firebase listener error:', error);
-      callback([]);
+      this.callbacks.forEach(callback => {
+        try {
+          callback([]);
+        } catch (e) {
+          console.error('Error in error callback:', e);
+        }
+      });
     });
   }
 
@@ -184,6 +233,10 @@ class LeaderboardManager {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
     }
+
+    // Clear all callbacks
+    this.callbacks.clear();
+    this.lastPlayersData = null;
 
     if (this.unsubscribe) {
       this.unsubscribe();

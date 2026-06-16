@@ -10,8 +10,8 @@ import { initFirebase, leaderboardManager } from './core/firebase-config.js';
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    const app = new PresenterApp();
-    app.init();
+    window.presenterApp = new PresenterApp();
+    window.presenterApp.init();
 });
 
 class PresenterApp {
@@ -24,6 +24,7 @@ class PresenterApp {
         this.isRunning = false;
         this.hintsRevealed = 0;
         this.currentSession = null;
+        this.leaderboardUnsubscribe = null; // Store unsubscribe function
     }
 
     init() {
@@ -87,7 +88,7 @@ class PresenterApp {
         this.leaderboard.currentSession = this.currentSession;
 
         // Listen for leaderboard updates (no need to join as presenter)
-        this.leaderboard.onLeaderboardUpdate((players) => {
+        this.leaderboardUnsubscribe = this.leaderboard.onLeaderboardUpdate((players) => {
             console.log('Leaderboard updated:', players);
             this.updateLeaderboardDisplay(players);
             this.updateParticipantCount(players);
@@ -386,4 +387,21 @@ class PresenterApp {
             console.warn('Could not play alert sound:', e);
         }
     }
+
+    dispose() {
+        // Unsubscribe from leaderboard updates
+        if (this.leaderboardUnsubscribe) {
+            this.leaderboardUnsubscribe();
+            this.leaderboardUnsubscribe = null;
+        }
+        console.log('Presenter disposed');
+    }
 }
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    const app = window.presenterApp;
+    if (app && app.dispose) {
+        app.dispose();
+    }
+});
