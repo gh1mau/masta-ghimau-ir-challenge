@@ -1,6 +1,6 @@
 /**
  * Main Application Module
- * Phase 3: ES Module Architecture
+ * Phase 3: ES Module Architecture - BUG FREE VERSION
  * Entry point for the IR Challenge application
  * Author: Hussein Mohamed masta ghimau
  */
@@ -24,6 +24,10 @@ class IRChallengeApp {
         this.challengeId = null;
         this.sessionCode = null;
         this.firebaseInitialized = false;
+        this.isProcessingTarget = false;
+        this.challengeShown = false;
+        this.countdownInterval = null;
+        this.challengeInfoInterval = null;
     }
 
     async init() {
@@ -253,45 +257,70 @@ class IRChallengeApp {
     }
 
     async onTargetFound(targetIndex) {
+        // Prevent multiple triggers - only process if not already processing
+        if (this.isProcessingTarget) {
+            console.log('Already processing target, ignoring duplicate trigger');
+            return;
+        }
+
+        // Check if we've already shown this challenge
+        if (this.challengeShown) {
+            console.log('Challenge already shown, ignoring target');
+            return;
+        }
+
+        this.isProcessingTarget = true;
         uiManager.setTrackingStatus('locked');
 
-        // Map target index to challenge ID
-        const challengeId = this.getChallengeIdFromTargetIndex(targetIndex);
+        try {
+            // Map target index to challenge ID
+            const challengeId = this.getChallengeIdFromTargetIndex(targetIndex);
 
-        if (challengeId && challengeId !== this.challengeId) {
-            this.loadChallenge(challengeId);
-            this.challengeId = challengeId;
-        }
-
-        // Add AR content for current challenge
-        if (this.arEngine && this.currentChallenge) {
-            try {
-                const modelPath = this.currentChallenge.modelPath;
-                const anchor = this.arEngine.anchors[targetIndex];
-                if (!anchor) return;
-
-                // Clear previous content
-                if (anchor.group) {
-                    while(anchor.group.children.length > 0) {
-                        anchor.group.remove(anchor.group.children[0]);
-                    }
-                }
-
-                // Create and add new content
-                const content = await this.arEngine.createARContent(null, modelPath);
-                if (anchor.group && content) {
-                    anchor.group.add(content);
-                }
-            } catch (error) {
-                logger.error('Failed to create AR content', { error: error.message });
+            if (challengeId && challengeId !== this.challengeId) {
+                this.loadChallenge(challengeId);
+                this.challengeId = challengeId;
             }
-        }
 
-        // NEW FLOW: Show fullscreen AR model for 5 seconds, then show challenge info
-        this.showFullscreenARModel();
+            // Add AR content for current challenge
+            if (this.arEngine && this.currentChallenge) {
+                try {
+                    const modelPath = this.currentChallenge.modelPath;
+                    const anchor = this.arEngine.anchors[targetIndex];
+                    if (!anchor) {
+                        console.warn('No anchor found for target index:', targetIndex);
+                        this.isProcessingTarget = false;
+                        return;
+                    }
+
+                    // Clear previous content
+                    if (anchor.group) {
+                        while(anchor.group.children.length > 0) {
+                            anchor.group.remove(anchor.group.children[0]);
+                        }
+                    }
+
+                    // Create and add new content
+                    const content = await this.arEngine.createARContent(null, modelPath);
+                    if (anchor.group && content) {
+                        anchor.group.add(content);
+                    }
+                } catch (error) {
+                    logger.error('Failed to create AR content', { error: error.message });
+                }
+            }
+
+            // NEW FLOW: Show fullscreen AR model for 5 seconds, then show challenge info
+            this.showFullscreenARModel();
+        } catch (error) {
+            console.error('Error in onTargetFound:', error);
+            this.isProcessingTarget = false;
+        }
     }
 
     showFullscreenARModel() {
+        // Clear any existing intervals first
+        this.clearAllIntervals();
+
         // Play sound
         if (this.arEngine) {
             this.arEngine.playSound('ghostAppear');
@@ -301,7 +330,7 @@ class IRChallengeApp {
         let countdown = 5;
         uiManager.showFullscreenAR(countdown);
 
-        const countdownInterval = setInterval(() => {
+        this.countdownInterval = setInterval(() => {
             countdown--;
 
             if (countdown > 0) {
@@ -310,7 +339,7 @@ class IRChallengeApp {
                     this.arEngine.playSound('countdown');
                 }
             } else {
-                clearInterval(countdownInterval);
+                this.clearAllIntervals();
                 uiManager.hideFullscreenAR();
                 // Now show challenge info box
                 this.showChallengeInfoBox();
@@ -319,6 +348,9 @@ class IRChallengeApp {
     }
 
     showChallengeInfoBox() {
+        // Clear any existing intervals first
+        this.clearAllIntervals();
+
         // Show challenge info overlay with description
         const challengeInfo = {
             title: this.currentChallenge.name,
@@ -332,7 +364,7 @@ class IRChallengeApp {
         let countdown = 10;
         uiManager.updateChallengeCountdown(countdown);
 
-        const countdownInterval = setInterval(() => {
+        this.challengeInfoInterval = setInterval(() => {
             countdown--;
 
             if (countdown > 0) {
@@ -341,7 +373,7 @@ class IRChallengeApp {
                     this.arEngine.playSound('countdown');
                 }
             } else {
-                clearInterval(countdownInterval);
+                this.clearAllIntervals();
                 if (this.arEngine) {
                     this.arEngine.playSound('quizStart');
                 }
@@ -350,6 +382,17 @@ class IRChallengeApp {
                 this.hideARAndShowQuiz();
             }
         }, 1000);
+    }
+
+    clearAllIntervals() {
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+            this.countdownInterval = null;
+        }
+        if (this.challengeInfoInterval) {
+            clearInterval(this.challengeInfoInterval);
+            this.challengeInfoInterval = null;
+        }
     }
 
     getChallengeIdFromTargetIndex(targetIndex) {
@@ -364,6 +407,9 @@ class IRChallengeApp {
     }
 
     showChallengeInfo() {
+        // Clear any existing intervals first
+        this.clearAllIntervals();
+
         // Play sound
         if (this.arEngine) {
             this.arEngine.playSound('ghostAppear');
@@ -382,7 +428,7 @@ class IRChallengeApp {
         let countdown = 15;
         uiManager.updateChallengeCountdown(countdown);
 
-        const countdownInterval = setInterval(() => {
+        this.challengeInfoInterval = setInterval(() => {
             countdown--;
 
             if (countdown > 0) {
@@ -392,7 +438,7 @@ class IRChallengeApp {
                     this.arEngine.playSound('countdown');
                 }
             } else {
-                clearInterval(countdownInterval);
+                this.clearAllIntervals();
                 // Play quiz start sound
                 if (this.arEngine) {
                     this.arEngine.playSound('quizStart');
@@ -406,6 +452,10 @@ class IRChallengeApp {
 
     hideARAndShowQuiz() {
         console.log('Hiding AR and showing quiz...');
+
+        // Mark challenge as shown to prevent re-triggering
+        this.challengeShown = true;
+        this.isProcessingTarget = false;
 
         // Hide AR container to make quiz full screen
         const arContainer = document.getElementById('ar-container');
@@ -517,6 +567,7 @@ class IRChallengeApp {
     }
 
     dispose() {
+        this.clearAllIntervals();
         if (this.arEngine) {
             this.arEngine.dispose();
             this.arEngine = null;

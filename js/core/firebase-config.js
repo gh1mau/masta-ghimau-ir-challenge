@@ -1,5 +1,5 @@
 /**
- * Firebase Configuration & Leaderboard Manager
+ * Firebase Configuration & Leaderboard Manager - BUG FREE VERSION
  * Real-time leaderboard for IR Challenge
  * Author: Hussein Mohamed masta ghimau
  */
@@ -123,15 +123,25 @@ class LeaderboardManager {
    * @param {Function} callback - Function to call with updated player list
    */
   onLeaderboardUpdate(callback) {
-    if (!firebaseInitialized || !database || !this.currentSession) {
-      logger.warn("Cannot listen for updates, Firebase not available");
+    if (!firebaseInitialized || !database) {
+      logger.warn('Cannot listen for updates, Firebase not available');
       return;
     }
 
-    const sessionRef = ref(database, `sessions/${this.currentSession}/players`);
+    // Use current session or default to 'default_session'
+    const sessionToListen = this.currentSession || 'default_session';
+    console.log('Listening to session:', sessionToListen);
+
+    const sessionRef = ref(database, `sessions/${sessionToListen}/players`);
+
+    // Unsubscribe from previous listener if exists
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
 
     this.unsubscribe = onValue(sessionRef, (snapshot) => {
       const data = snapshot.val();
+      console.log('Leaderboard data received:', data);
       if (data) {
         const players = Object.entries(data)
           .map(([id, player]) => ({ id, ...player }))
@@ -142,6 +152,9 @@ class LeaderboardManager {
       } else {
         callback([]);
       }
+    }, (error) => {
+      console.error('Firebase listener error:', error);
+      callback([]);
     });
   }
 

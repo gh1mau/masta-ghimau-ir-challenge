@@ -1,5 +1,5 @@
 /**
- * Masta Ghimau IR Challenge - Presenter Screen Controller
+ * Masta Ghimau IR Challenge - Presenter Screen Controller - BUG FREE VERSION
  * Author: Hussein Mohamed masta ghimau
  * YouTube: https://www.youtube.com/@mastaghimau
  * GitHub: https://github.com/gh1mau
@@ -31,7 +31,6 @@ class PresenterApp {
         this.setupEventListeners();
         this.setupLeaderboard();
         this.generateQRCode();
-        this.updateParticipantCount();
     }
 
     setupEventListeners() {
@@ -40,7 +39,7 @@ class PresenterApp {
         document.getElementById('btn-pause').addEventListener('click', () => this.pauseChallenge());
         document.getElementById('btn-reset').addEventListener('click', () => this.resetChallenge());
         document.getElementById('btn-load').addEventListener('click', () => this.loadSelectedChallenge());
-        
+
         // Challenge selector
         document.getElementById('challenge-select').addEventListener('change', (e) => {
             this.currentChallengeId = parseInt(e.target.value);
@@ -79,17 +78,19 @@ class PresenterApp {
         const urlParams = new URLSearchParams(window.location.search);
         this.currentSession = urlParams.get('session') || this.getSessionId();
 
+        // Store session in localStorage so challenge page can access it
+        localStorage.setItem('mastaGhimau_sessionId', this.currentSession);
+
         console.log('Presenter session:', this.currentSession);
 
-        // Join the session as presenter (observer)
-        this.leaderboard.joinSession(this.currentSession, 'Presenter').then(() => {
-            console.log('Presenter joined leaderboard session:', this.currentSession);
+        // Set the session in leaderboard manager
+        this.leaderboard.currentSession = this.currentSession;
 
-            // Listen for leaderboard updates
-            this.leaderboard.onLeaderboardUpdate((players) => {
-                console.log('Leaderboard updated:', players);
-                this.updateLeaderboardDisplay(players);
-            });
+        // Listen for leaderboard updates (no need to join as presenter)
+        this.leaderboard.onLeaderboardUpdate((players) => {
+            console.log('Leaderboard updated:', players);
+            this.updateLeaderboardDisplay(players);
+            this.updateParticipantCount(players);
         });
     }
 
@@ -340,9 +341,12 @@ class PresenterApp {
         `).join('');
     }
 
-    updateParticipantCount() {
-        const stats = this.leaderboard.getStats();
-        document.getElementById('participant-count').textContent = stats.totalParticipants;
+    updateParticipantCount(players = null) {
+        const count = players ? players.length : 0;
+        const countEl = document.getElementById('participant-count');
+        if (countEl) {
+            countEl.textContent = count;
+        }
     }
 
     broadcastMessage(message) {
