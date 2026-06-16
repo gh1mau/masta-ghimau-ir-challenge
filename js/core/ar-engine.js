@@ -117,7 +117,8 @@ class AREngine {
                     logger.ar('Target lost', { index: i });
                     this.showScanInstructions();
                     if (this.onTargetLost) this.onTargetLost(i);
-                    this.currentTargetIndex = -1;
+                    // Don't clear content - let it stay visible
+                    // this.currentTargetIndex = -1; // Keep the current target index
                 }
             };
 

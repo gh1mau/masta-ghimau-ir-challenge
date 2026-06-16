@@ -73,14 +73,21 @@ class IRChallengeApp {
     showNicknameEntry() {
         uiManager.showNicknameModal(async (nickname) => {
             this.playerName = nickname;
-            this.sessionCode = this.challengeId; // Use challenge ID as session code
+
+            // Get session code from URL or use challenge ID as default
+            const urlParams = new URLSearchParams(window.location.search);
+            this.sessionCode = urlParams.get('session') || this.challengeId;
+
+            console.log('Joining session:', this.sessionCode, 'as player:', nickname);
 
             // Join leaderboard session
             if (this.firebaseInitialized) {
                 const joined = await leaderboardManager.joinSession(this.sessionCode, nickname);
                 if (joined) {
                     logger.info('Joined leaderboard session', { session: this.sessionCode, player: nickname });
-                    this.startLeaderboardListener();
+                    console.log('Successfully joined leaderboard session');
+                } else {
+                    console.warn('Failed to join leaderboard session');
                 }
             }
 
