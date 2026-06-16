@@ -12,6 +12,7 @@ import { uiManager } from './core/ui-manager.js';
 import { AREngine } from './core/ar-engine.js';
 import { initFirebase, leaderboardManager } from './core/firebase-config.js';
 import { isValidScenario, sanitizeInput, requiresHTTPS, hasCameraAPI } from './utils/helpers.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
 class IRChallengeApp {
     constructor() {
@@ -310,17 +311,26 @@ class IRChallengeApp {
                         return;
                     }
 
+                    // Ensure anchor.group exists (create if not)
+                    if (!anchor.group) {
+                        console.log('Creating new group for anchor');
+                        anchor.group = new THREE.Group();
+                        // Position the group at center of screen
+                        anchor.group.position.set(0, 0, 0);
+                    }
+
                     // Clear previous content
-                    if (anchor.group) {
-                        while(anchor.group.children.length > 0) {
-                            anchor.group.remove(anchor.group.children[0]);
-                        }
+                    while(anchor.group.children.length > 0) {
+                        anchor.group.remove(anchor.group.children[0]);
                     }
 
                     // Create and add new content
                     const content = await this.arEngine.createARContent(null, modelPath);
-                    if (anchor.group && content) {
+                    if (content) {
+                        // Center the content in the group
+                        content.position.set(0, 0, 0);
                         anchor.group.add(content);
+                        console.log('AR content added to anchor group');
                     }
                 } catch (error) {
                     logger.error('Failed to create AR content', { error: error.message });

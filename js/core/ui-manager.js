@@ -93,7 +93,7 @@ class UIManager {
             panel.style.height = '100%';
             panel.style.zIndex = '2000';
             panel.style.background = 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%)';
-            panel.style.padding = '20px';
+            panel.style.padding = '0';
             panel.style.overflowY = 'auto';
             panel.style.boxSizing = 'border-box';
         }
@@ -101,16 +101,18 @@ class UIManager {
         // Calculate progress percentage
         const progressPercent = ((currentIndex + 1) / totalQuestions) * 100;
 
-        // Clear panel and create new professional layout
+        // Clear panel and create new professional layout - FULL HEIGHT
         panel.innerHTML = `
             <div style="
                 max-width: 700px;
                 margin: 0 auto;
-                padding: 40px 20px;
+                padding: 20px;
                 min-height: 100vh;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
+                padding-top: 40px;
+                padding-bottom: 40px;
             ">
                 <!-- Header with Progress -->
                 <div style="
