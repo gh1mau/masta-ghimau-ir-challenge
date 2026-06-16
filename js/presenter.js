@@ -291,14 +291,14 @@ class PresenterApp {
         let sessionId = urlParams.get('session');
 
         if (!sessionId) {
-            // Check sessionStorage
-            sessionId = sessionStorage.getItem('mastaGhimau_sessionId');
+            // Check localStorage (shared with challenge page)
+            sessionId = localStorage.getItem('mastaGhimau_sessionId');
         }
 
         if (!sessionId) {
             // Generate new session ID
             sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            sessionStorage.setItem('mastaGhimau_sessionId', sessionId);
+            localStorage.setItem('mastaGhimau_sessionId', sessionId);
         }
 
         return sessionId;

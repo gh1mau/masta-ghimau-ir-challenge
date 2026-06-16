@@ -280,14 +280,45 @@ class UIManager {
     }
 
     markAnswer(selectedBtn, correctIndex, selectedIndex, explanation) {
-        const allBtns = this.elements.optionsContainer.querySelectorAll('.option-btn');
+        // Get all buttons from the quiz options container
+        const optionsContainer = document.getElementById('quiz-options-container');
+        if (!optionsContainer) {
+            console.error('Quiz options container not found');
+            return;
+        }
+
+        const allBtns = optionsContainer.querySelectorAll('.quiz-option-btn');
+
+        // Validate correctIndex is within bounds
+        if (correctIndex < 0 || correctIndex >= allBtns.length) {
+            console.error('Invalid correctIndex:', correctIndex, 'Total buttons:', allBtns.length);
+            return;
+        }
 
         if (selectedIndex === correctIndex) {
             selectedBtn.classList.add('correct');
+            selectedBtn.style.background = 'rgba(0, 255, 65, 0.3)';
+            selectedBtn.style.borderColor = '#00ff41';
         } else {
             selectedBtn.classList.add('wrong');
-            allBtns[correctIndex].classList.add('correct');
+            selectedBtn.style.background = 'rgba(255, 0, 64, 0.3)';
+            selectedBtn.style.borderColor = '#ff0040';
+            
+            // Highlight correct answer
+            const correctBtn = allBtns[correctIndex];
+            if (correctBtn) {
+                correctBtn.classList.add('correct');
+                correctBtn.style.background = 'rgba(0, 255, 65, 0.3)';
+                correctBtn.style.borderColor = '#00ff41';
+            }
         }
+
+        // Disable all buttons
+        allBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.style.cursor = 'not-allowed';
+            btn.style.opacity = '0.7';
+        });
 
         if (explanation) {
             setTimeout(() => alert(explanation), 100);
