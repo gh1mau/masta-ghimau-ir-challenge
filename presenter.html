@@ -595,9 +595,6 @@
                 <button class="btn" id="start-btn" onclick="startChallenge()" disabled>
                     [ START CHALLENGE ]
                 </button>
-                <button class="btn" onclick="showAnswer()">
-                    [ SHOW ANSWER ]
-                </button>
             </div>
         </div>
     </div>
@@ -762,11 +759,6 @@
             const secs = seconds % 60;
             document.getElementById('timer').textContent = 
                 `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-        
-        function showAnswer() {
-            if (!currentScenario) return;
-            alert(`[ ${currentScenario.title} ]\n\nSeverity: ${currentScenario.severity.toUpperCase()}\nActor: ${currentScenario.actor}\nQuestions: ${currentScenario.questions}`);
         }
     </script>
 </body>
