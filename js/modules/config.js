@@ -4,7 +4,7 @@
  * Author: Hussein Mohamed masta ghimau
  */
 
-const CONFIG = {
+const CONFIG = { 
     // Application metadata
     app: {
         name: 'Masta Ghimau IR Challenge',
