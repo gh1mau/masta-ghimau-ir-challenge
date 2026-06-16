@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masta Ghimau IR Challenge | Live Leaderboard</title>
+    <title>masta ghimau Leaderboard</title>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -42,18 +42,19 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
+            padding: 25px;
             background: linear-gradient(135deg, var(--bg-secondary) 0%, #1a202c 100%);
             border: 1px solid var(--border);
             border-radius: 16px;
         }
         
         .header h1 {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 800;
             color: var(--accent);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            font-family: 'JetBrains Mono', monospace;
         }
         
         .header p {
@@ -61,45 +62,32 @@
             font-size: 14px;
         }
         
-        .session-code {
-            display: inline-block;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid var(--accent);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 14px;
-            color: var(--accent);
-            margin-top: 10px;
-        }
-        
-        /* Status */
-        .status {
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-        }
-        
-        .status-indicator {
+        /* Auto-refresh indicator */
+        .refresh-indicator {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
+            margin-top: 15px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--success);
+            font-family: 'JetBrains Mono', monospace;
         }
         
-        .status-dot {
-            width: 8px;
-            height: 8px;
+        .refresh-dot {
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: var(--success);
-            box-shadow: 0 0 8px var(--success);
-            animation: pulse 2s infinite;
+            animation: pulse 1.5s infinite;
         }
         
         @keyframes pulse {
             0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            50% { opacity: 0.3; }
         }
         
         /* Leaderboard */
@@ -108,6 +96,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
+            margin-bottom: 20px;
         }
         
         .leaderboard-header {
@@ -238,7 +227,7 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 12px;
-            margin-top: 20px;
+            margin-bottom: 20px;
         }
         
         .stat-box {
@@ -264,37 +253,122 @@
             margin-top: 4px;
         }
         
-        /* Debug Panel */
+        /* Collapsible Debug Panel */
         .debug-panel {
             margin-top: 20px;
-            padding: 15px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 10px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
+            overflow: hidden;
+        }
+        
+        .debug-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .debug-header:hover {
+            background: rgba(0, 212, 255, 0.05);
         }
         
         .debug-title {
             color: var(--text-secondary);
-            margin-bottom: 8px;
             font-size: 11px;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .debug-title::before {
+            content: '🔧';
+        }
+        
+        .debug-toggle {
+            font-size: 12px;
+            color: var(--accent);
+            transition: transform 0.2s;
+        }
+        
+        .debug-panel.collapsed .debug-toggle {
+            transform: rotate(-90deg);
+        }
+        
+        .debug-content {
+            max-height: 300px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .debug-panel.collapsed .debug-content {
+            max-height: 0;
+        }
+        
+        .debug-info {
+            padding: 15px;
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+        
+        .debug-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .debug-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .debug-label {
+            color: var(--text-secondary);
+        }
+        
+        .debug-value {
+            color: var(--accent);
         }
         
         .debug-log {
-            color: var(--accent);
-            line-height: 1.6;
-            max-height: 150px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            max-height: 200px;
             overflow-y: auto;
+            background: var(--bg-primary);
         }
         
-        .debug-log .error {
+        .debug-log .entry {
+            margin-bottom: 6px;
+            line-height: 1.5;
+        }
+        
+        .debug-log .timestamp {
+            color: var(--text-secondary);
+        }
+        
+        .debug-log .message {
+            color: var(--accent);
+        }
+        
+        .debug-log .error .message {
             color: var(--danger);
         }
         
-        .debug-log .success {
+        .debug-log .success .message {
             color: var(--success);
+        }
+        
+        .debug-log .warning .message {
+            color: var(--warning);
         }
         
         /* Footer */
@@ -315,7 +389,7 @@
         /* Responsive */
         @media (max-width: 600px) {
             .header h1 {
-                font-size: 22px;
+                font-size: 24px;
             }
             
             .participant-name {
@@ -336,16 +410,27 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <h1>🏆 Live Leaderboard</h1>
-            <p>Masta Ghimau IR Challenge</p>
-            <div class="session-code" id="session-code">Session: Loading...</div>
+            <h1>🏆 masta ghimau Leaderboard</h1>
+            <p>Real-time Multiplayer Challenge</p>
+            <div class="refresh-indicator">
+                <div class="refresh-dot"></div>
+                <span id="refresh-status">Auto-refresh: ON</span>
+            </div>
         </div>
         
-        <!-- Status -->
-        <div class="status">
-            <div class="status-indicator">
-                <div class="status-dot"></div>
-                <span id="status-text">Connecting to Firebase...</span>
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-value" id="stat-players">0</div>
+                <div class="stat-label">Active Players</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-avg">0</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-value" id="stat-high">0</div>
+                <div class="stat-label">High Score</div>
             </div>
         </div>
         
@@ -364,27 +449,34 @@
             </div>
         </div>
         
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-box">
-                <div class="stat-value" id="stat-players">0</div>
-                <div class="stat-label">Players</div>
+        <!-- Collapsible Debug Panel -->
+        <div class="debug-panel collapsed" id="debug-panel">
+            <div class="debug-header" onclick="toggleDebug()">
+                <span class="debug-title">System Diagnostics</span>
+                <span class="debug-toggle">▼</span>
             </div>
-            <div class="stat-box">
-                <div class="stat-value" id="stat-avg">0</div>
-                <div class="stat-label">Avg Score</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-value" id="stat-high">0</div>
-                <div class="stat-label">High Score</div>
-            </div>
-        </div>
-        
-        <!-- Debug Panel -->
-        <div class="debug-panel">
-            <div class="debug-title">Debug Log</div>
-            <div class="debug-log" id="debug-log">
-                Initializing leaderboard...
+            <div class="debug-content">
+                <div class="debug-info">
+                    <div class="debug-row">
+                        <span class="debug-label">Session ID:</span>
+                        <span class="debug-value" id="debug-session">-</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Firebase Status:</span>
+                        <span class="debug-value" id="debug-firebase">Connecting...</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Last Update:</span>
+                        <span class="debug-value" id="debug-lastupdate">-</span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Auto-refresh:</span>
+                        <span class="debug-value" id="debug-autorefresh">Enabled (5s)</span>
+                    </div>
+                </div>
+                <div class="debug-log" id="debug-log">
+                    <div class="entry"><span class="timestamp">[--:--:--]</span> <span class="message">System initialized...</span></div>
+                </div>
             </div>
         </div>
         
@@ -399,7 +491,7 @@
     <script type="module">
         // Import Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
         
         // Firebase Configuration
         const firebaseConfig = {
@@ -413,78 +505,92 @@
             measurementId: "G-K5508CP1CC"
         };
         
+        // State
+        let app, database;
+        let currentSession = null;
+        let unsubscribe = null;
+        let autoRefreshInterval = null;
+        let lastUpdateTime = null;
+        
         // Debug logger
         function log(message, type = 'info') {
             const debugLog = document.getElementById('debug-log');
             const timestamp = new Date().toLocaleTimeString();
-            const line = document.createElement('div');
-            line.className = type;
-            line.textContent = `[${timestamp}] ${message}`;
-            debugLog.appendChild(line);
+            const entry = document.createElement('div');
+            entry.className = `entry ${type}`;
+            entry.innerHTML = `<span class="timestamp">[${timestamp}]</span> <span class="message">${message}</span>`;
+            debugLog.appendChild(entry);
             debugLog.scrollTop = debugLog.scrollHeight;
             console.log(`[${timestamp}] ${message}`);
+            
+            // Update last update time
+            lastUpdateTime = timestamp;
+            document.getElementById('debug-lastupdate').textContent = timestamp;
         }
         
-        // Initialize Firebase
-        let app, database;
-        let currentSession = null;
-        let unsubscribe = null;
+        // Toggle debug panel
+        window.toggleDebug = function() {
+            const panel = document.getElementById('debug-panel');
+            panel.classList.toggle('collapsed');
+        };
         
+        // Initialize
         function init() {
-            log('Initializing Firebase...');
+            log('Initializing system...');
             
             try {
                 app = initializeApp(firebaseConfig);
                 database = getDatabase(app);
-                log('✓ Firebase initialized successfully', 'success');
+                log('✓ Firebase SDK loaded', 'success');
                 
-                // Get session from URL or localStorage
+                // Get session
                 const urlParams = new URLSearchParams(window.location.search);
                 currentSession = urlParams.get('session') || localStorage.getItem('mastaGhimau_sessionId');
                 
                 if (!currentSession) {
-                    log('⚠ No session found in URL or localStorage', 'error');
-                    document.getElementById('status-text').textContent = 'No Session - Waiting...';
+                    log('⚠ No session ID found', 'warning');
+                    document.getElementById('debug-session').textContent = 'Not set';
+                    document.getElementById('debug-firebase').textContent = 'Waiting for session...';
                     
-                    // Try to get session from URL again after a delay
+                    // Retry after delay
                     setTimeout(() => {
                         const retryParams = new URLSearchParams(window.location.search);
                         currentSession = retryParams.get('session') || localStorage.getItem('mastaGhimau_sessionId');
                         if (currentSession) {
-                            log(`✓ Session found on retry: ${currentSession}`, 'success');
-                            document.getElementById('session-code').textContent = `Session: ${currentSession}`;
+                            log(`✓ Session found: ${currentSession}`, 'success');
                             startListening();
                         }
-                    }, 2000);
+                    }, 3000);
                     return;
                 }
                 
-                document.getElementById('session-code').textContent = `Session: ${currentSession}`;
-                log(`Session: ${currentSession}`);
-                
-                // Start listening
+                log(`✓ Session: ${currentSession}`, 'success');
+                document.getElementById('debug-session').textContent = currentSession.substring(0, 20) + '...';
                 startListening();
                 
             } catch (error) {
-                log(`✗ Firebase init error: ${error.message}`, 'error');
-                document.getElementById('status-text').textContent = 'Firebase Error';
+                log(`✗ Init error: ${error.message}`, 'error');
+                document.getElementById('debug-firebase').textContent = 'Error';
             }
         }
         
+        // Start Firebase listener + auto-refresh
         function startListening() {
             if (!database || !currentSession) {
-                log('Cannot start listening - missing database or session', 'error');
+                log('Cannot start - missing database or session', 'error');
                 return;
             }
             
-            log(`Starting listener for session: ${currentSession}`);
-            document.getElementById('status-text').textContent = 'Connected - Listening for updates...';
+            log('Connecting to Firebase...');
+            document.getElementById('debug-firebase').textContent = 'Connected';
             
             const sessionRef = ref(database, `sessions/${currentSession}/players`);
             
+            // Real-time listener
             unsubscribe = onValue(sessionRef, (snapshot) => {
                 const data = snapshot.val();
-                log(`Data received: ${data ? Object.keys(data).length : 0} players`);
+                const playerCount = data ? Object.keys(data).length : 0;
+                log(`📊 Data received: ${playerCount} players`, 'success');
                 
                 if (data) {
                     const players = Object.entries(data)
@@ -496,11 +602,41 @@
                     updateLeaderboard([]);
                 }
             }, (error) => {
-                log(`Listener error: ${error.message}`, 'error');
-                document.getElementById('status-text').textContent = 'Connection Error';
+                log(`✗ Firebase error: ${error.message}`, 'error');
+                document.getElementById('debug-firebase').textContent = 'Error';
             });
+            
+            // Auto-refresh backup (every 5 seconds)
+            autoRefreshInterval = setInterval(() => {
+                refreshData();
+            }, 5000);
+            
+            log('✓ Auto-refresh enabled (5s interval)', 'success');
         }
         
+        // Manual refresh function
+        async function refreshData() {
+            if (!database || !currentSession) return;
+            
+            try {
+                const sessionRef = ref(database, `sessions/${currentSession}/players`);
+                const snapshot = await get(sessionRef);
+                const data = snapshot.val();
+                
+                if (data) {
+                    const players = Object.entries(data)
+                        .map(([id, player]) => ({ id, ...player }))
+                        .sort((a, b) => b.score - a.score);
+                    
+                    updateLeaderboard(players);
+                    log('🔄 Auto-refreshed data', 'info');
+                }
+            } catch (error) {
+                log(`✗ Refresh error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Update leaderboard UI
         function updateLeaderboard(players) {
             const container = document.getElementById('leaderboard');
             
@@ -548,7 +684,6 @@
             });
             
             container.innerHTML = html;
-            log(`Leaderboard updated: ${players.length} players`);
         }
         
         function escapeHtml(text) {
@@ -557,12 +692,11 @@
             return div.innerHTML;
         }
         
-        // Cleanup on page unload
+        // Cleanup
         window.addEventListener('beforeunload', () => {
-            if (unsubscribe) {
-                unsubscribe();
-                log('Unsubscribed from updates');
-            }
+            if (unsubscribe) unsubscribe();
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+            log('System shutting down...');
         });
         
         // Start
