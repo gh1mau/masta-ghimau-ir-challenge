@@ -64,6 +64,7 @@ class Logger {
     error(msg) { this.log(msg, 'error'); }
     warn(msg) { this.log(msg, 'warn'); }
     info(msg) { this.log(msg, 'info'); }
+    debug(msg) { this.log(msg, 'debug'); }
     ar(msg) { this.log(msg, 'ar'); }
 
     timer(label) {
