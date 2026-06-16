@@ -277,17 +277,27 @@ class UIManager {
         const input = document.getElementById('nickname-input');
         const submitBtn = document.getElementById('nickname-submit');
 
-        if (!modal || !input || !submitBtn) return;
+        if (!modal || !input || !submitBtn) {
+            console.error('Nickname modal elements not found:', {
+                modal: !!modal,
+                input: !!input,
+                submitBtn: !!submitBtn
+            });
+            return;
+        }
 
         modal.style.display = 'flex';
         input.focus();
 
         const handleSubmit = () => {
             const nickname = input.value.trim();
+            console.log('Nickname submitted:', nickname);
             if (nickname.length >= 2 && nickname.length <= 20) {
+                console.log('Hiding modal and calling onSubmit');
                 modal.style.display = 'none';
                 onSubmit(nickname);
             } else {
+                console.log('Nickname too short or too long');
                 input.style.borderColor = '#ff0040';
                 setTimeout(() => {
                     input.style.borderColor = '#00ffff';
@@ -295,10 +305,17 @@ class UIManager {
             }
         };
 
+        // Remove any existing listeners first
+        submitBtn.onclick = null;
+        input.onkeypress = null;
+
+        // Add new listeners
         submitBtn.onclick = handleSubmit;
         input.onkeypress = (e) => {
             if (e.key === 'Enter') handleSubmit();
         };
+
+        console.log('Nickname modal shown, listeners attached');
     }
 
     hideNicknameModal() {
