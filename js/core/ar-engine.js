@@ -147,20 +147,20 @@ class AREngine {
     playSound(type, challengeId = null) {
         if (!this.audioContext) return;
 
-        // Ghost/Mystic themed sounds with different variations per challenge
+        // AGGRESSIVE Ghost/Mystic themed sounds with different variations per challenge
         const challengeSounds = {
-            // Ransomware - Dark/Evil ghost
-            chal_1: { baseFreq: 150, harmonics: [0.5, 1, 2], wave: 'sawtooth', reverb: 0.8 },
-            // Phishing - Sneaky/Slippery ghost
-            chal_2: { baseFreq: 200, harmonics: [1, 1.5, 3], wave: 'triangle', reverb: 0.6 },
-            // APT - Ancient/Powerful ghost
-            chal_3: { baseFreq: 100, harmonics: [1, 2, 4], wave: 'sawtooth', reverb: 0.9 },
-            // DDoS - Chaotic/Angry ghost
-            chal_4: { baseFreq: 80, harmonics: [1, 2.5, 5], wave: 'square', reverb: 0.7 },
-            // Supply Chain - Deceptive/Charming ghost
-            chal_5: { baseFreq: 250, harmonics: [1, 1.2, 2.4], wave: 'sine', reverb: 0.5 },
-            // Info Stealer - Quick/Silent ghost
-            chal_6: { baseFreq: 300, harmonics: [1, 2, 3], wave: 'triangle', reverb: 0.4 }
+            // Ransomware - Dark/Evil ghost (AGGRESSIVE)
+            chal_1: { baseFreq: 80, harmonics: [0.5, 1, 2, 4], wave: 'sawtooth', reverb: 0.9, distortion: 0.8 },
+            // Phishing - Sneaky/Slippery ghost (AGGRESSIVE)
+            chal_2: { baseFreq: 120, harmonics: [1, 2, 3, 5], wave: 'square', reverb: 0.8, distortion: 0.6 },
+            // APT - Ancient/Powerful ghost (AGGRESSIVE)
+            chal_3: { baseFreq: 60, harmonics: [1, 2, 4, 8], wave: 'sawtooth', reverb: 0.95, distortion: 0.9 },
+            // DDoS - Chaotic/Angry ghost (AGGRESSIVE)
+            chal_4: { baseFreq: 50, harmonics: [1, 3, 5, 7], wave: 'square', reverb: 0.85, distortion: 0.9 },
+            // Supply Chain - Deceptive/Charming ghost (AGGRESSIVE)
+            chal_5: { baseFreq: 150, harmonics: [1, 2, 3, 4], wave: 'sawtooth', reverb: 0.7, distortion: 0.7 },
+            // Info Stealer - Quick/Silent ghost (AGGRESSIVE)
+            chal_6: { baseFreq: 180, harmonics: [1, 2, 4, 6], wave: 'square', reverb: 0.6, distortion: 0.5 }
         };
 
         const challenge = challengeId ? challengeSounds[challengeId] : null;
@@ -225,9 +225,9 @@ class AREngine {
         const sound = sounds[type];
         if (!sound) return;
 
-        // Create master gain for volume control
+        // Create master gain for volume control - LOUDER AND MORE AGGRESSIVE
         const masterGain = this.audioContext.createGain();
-        masterGain.gain.value = 0.4;
+        masterGain.gain.value = 0.8; // Increased from 0.4 to 0.8 (2x louder)
         masterGain.connect(this.audioContext.destination);
 
         // Add reverb effect

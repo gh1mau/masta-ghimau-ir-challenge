@@ -179,21 +179,6 @@ class UIManager {
                     flex: 1;
                 "></div>
 
-                <!-- Explanation Container (hidden by default) - ENHANCED FOR MOBILE -->
-                <div id="explanation-container" style="
-                    display: none;
-                    margin-top: 20px;
-                    padding: 20px;
-                    background: rgba(0, 255, 65, 0.15);
-                    border: 2px solid rgba(0, 255, 65, 0.5);
-                    border-radius: 16px;
-                    flex-shrink: 0;
-                    box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
-                    min-height: 100px;
-                ">
-                    <div id="explanation-title" style="color: #00ff41; font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">✓ Correct Answer</div>
-                    <div id="explanation-text" style="color: #ffffff; font-size: 16px; line-height: 1.7; font-weight: 400;"></div>
-                </div>
             </div>
         `;
 
