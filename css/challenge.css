@@ -18,6 +18,47 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Disable hover effects on touch devices (iPhone, Android) */
+@media (hover: none) and (pointer: coarse) {
+    .quiz-option-btn:hover,
+    .quiz-option-btn:active,
+    .quiz-option-btn:focus {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border-color: rgba(0, 255, 255, 0.2) !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+    
+    .quiz-option-btn.answered:hover,
+    .quiz-option-btn.answered:active,
+    .quiz-option-btn.answered:focus {
+        background: inherit !important;
+        border-color: inherit !important;
+    }
+    
+    /* Prevent any hover state on touch devices */
+    *:hover {
+        -webkit-transform: none !important;
+        transform: none !important;
+    }
+}
+
+/* Additional iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .quiz-option-btn {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    .quiz-option-btn:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border-color: rgba(0, 255, 255, 0.2) !important;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+}
+
 body {
     font-family: 'Share Tech Mono', monospace;
     background: var(--cyber-dark);
