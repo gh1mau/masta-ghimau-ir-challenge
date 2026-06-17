@@ -3,111 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compile MindAR Targets</title>
+    <title>Compile AR Targets - MindAR Compiler Helper</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
             color: #fff;
-        }
-        h1 { color: #00ffff; }
-        .step {
-            background: #16213e;
             padding: 20px;
-            margin: 20px 0;
-            border-radius: 10px;
-            border: 1px solid #00ffff;
         }
-        button {
-            background: #00ffff;
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+        .warning {
+            background: rgba(255, 204, 0, 0.1);
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .warning h2 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .warning ol {
+            text-align: left;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        .warning li {
+            margin-bottom: 8px;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .target-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 3px solid;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .target-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .target-index {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        .target-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .target-challenge {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .target-canvas {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            background: #fff;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #00ff41, #00cc33);
             color: #000;
             border: none;
-            padding: 15px 30px;
-            font-size: 16px;
+            padding: 12px 25px;
+            border-radius: 25px;
             font-weight: bold;
-            border-radius: 5px;
             cursor: pointer;
-            margin: 10px 5px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+            font-size: 1rem;
         }
-        button:hover {
-            background: #00cccc;
+
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
         }
-        #status {
-            margin-top: 20px;
-            padding: 15px;
-            background: #0f3460;
-            border-radius: 5px;
-            min-height: 50px;
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
         }
-        .success { color: #00ff88; }
-        .error { color: #ff0040; }
-        .info { color: #00ffff; }
-        a {
-            color: #00ffff;
+
+        .generate-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: #fff;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px;
         }
+
+        .generate-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .mapping-table {
+            background: rgba(0, 255, 65, 0.05);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .mapping-table h3 {
+            color: #00ff41;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            color: #00ff41;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .index-0 { border-color: #ff0040; color: #ff0040; }
+        .index-1 { border-color: #ffaa00; color: #ffaa00; }
+        .index-2 { border-color: #aa00ff; color: #aa00ff; }
+        .index-3 { border-color: #00aaff; color: #00aaff; }
+        .index-4 { border-color: #00ff41; color: #00ff41; }
+        .index-5 { border-color: #ff6600; color: #ff6600; }
     </style>
 </head>
 <body>
-    <h1>🔧 MindAR Target Compiler</h1>
-    
-    <div class="step">
-        <h2>Step 1: Online Compiler (Recommended)</h2>
-        <p>The easiest way to compile targets is using the official MindAR online compiler:</p>
-        <ol>
-            <li>Go to <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/" target="_blank">MindAR Target Compiler</a></li>
-            <li>Upload all 6 target images from <code>assets/targets/</code>:
-                <ul>
-                    <li>challenge0.png</li>
-                    <li>challenge1.png</li>
-                    <li>challenge2.png</li>
-                    <li>challenge3.png</li>
-                    <li>challenge4.png</li>
-                    <li>challenge5.png</li>
-                </ul>
-            </li>
-            <li>Set "Dimensions" to 1</li>
-            <li>Click "Compile"</li>
-            <li>Download <code>targets.mind</code></li>
-            <li>Place it in <code>assets/targets/targets.mind</code></li>
-        </ol>
-    </div>
+    <div class="container">
+        <h1>🎯 MindAR Target Compiler Helper</h1>
+        <p class="subtitle">Generate targets in CORRECT ORDER for MindAR compilation</p>
 
-    <div class="step">
-        <h2>Step 2: Alternative - Use Demo Mode</h2>
-        <p>If you cannot compile targets, the app will automatically fall back to Quiz Mode which works without AR.</p>
-        <button onclick="window.location.href='challenge.html'">Go to Challenge</button>
-    </div>
+        <div class="warning">
+            <h2>⚠️ IMPORTANT: Upload Order Matters!</h2>
+            <ol>
+                <li><strong>Generate all targets</strong> using the button below</li>
+                <li><strong>Download each target ONE BY ONE</strong> in order (0 → 5)</li>
+                <li>Go to <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/" target="_blank" style="color: #00ff41;">MindAR Compiler</a></li>
+                <li><strong>Upload targets ONE BY ONE</strong> in the same order (0 → 5)</li>
+                <li>Verify the order in the compiler matches the table below</li>
+                <li>Click "Compile" and download <code>targets.mind</code></li>
+            </ol>
+        </div>
 
-    <div class="step">
-        <h2>Step 3: Quick Test</h2>
-        <p>Click below to check if targets.mind exists:</p>
-        <button onclick="checkTarget()">Check targets.mind</button>
-        <div id="status">Waiting...</div>
+        <div class="targets-grid">
+            <!-- Target 0: Ransomware -->
+            <div class="target-card index-0">
+                <div class="target-index">0</div>
+                <div class="target-name">🔒 RANSOMWARE</div>
+                <div class="target-challenge">chal_1 | Scenario: ransomware</div>
+                <canvas id="canvas-0" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(0)">⬇️ Download Target 0</button>
+            </div>
+
+            <!-- Target 1: Phishing -->
+            <div class="target-card index-1">
+                <div class="target-index">1</div>
+                <div class="target-name">🎣 PHISHING</div>
+                <div class="target-challenge">chal_2 | Scenario: phishing</div>
+                <canvas id="canvas-1" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(1)">⬇️ Download Target 1</button>
+            </div>
+
+            <!-- Target 2: APT -->
+            <div class="target-card index-2">
+                <div class="target-index">2</div>
+                <div class="target-name">🕵️ APT</div>
+                <div class="target-challenge">chal_3 | Scenario: apt</div>
+                <canvas id="canvas-2" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(2)">⬇️ Download Target 2</button>
+            </div>
+
+            <!-- Target 3: DDoS -->
+            <div class="target-card index-3">
+                <div class="target-index">3</div>
+                <div class="target-name">🌐 DDoS</div>
+                <div class="target-challenge">chal_4 | Scenario: ddos</div>
+                <canvas id="canvas-3" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(3)">⬇️ Download Target 3</button>
+            </div>
+
+            <!-- Target 4: Supply Chain -->
+            <div class="target-card index-4">
+                <div class="target-index">4</div>
+                <div class="target-name">📦 SUPPLY CHAIN</div>
+                <div class="target-challenge">chal_5 | Scenario: supplychain</div>
+                <canvas id="canvas-4" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(4)">⬇️ Download Target 4</button>
+            </div>
+
+            <!-- Target 5: InfoStealer -->
+            <div class="target-card index-5">
+                <div class="target-index">5</div>
+                <div class="target-name">💾 INFO STEALER</div>
+                <div class="target-challenge">chal_6 | Scenario: infostealer</div>
+                <canvas id="canvas-5" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(5)">⬇️ Download Target 5</button>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="generate-btn" onclick="generateAll()">🎨 Generate All Targets</button>
+            <button class="generate-btn" onclick="downloadAll()">💾 Download All (in order)</button>
+        </div>
+
+        <div class="mapping-table">
+            <h3>📋 Complete Mapping Reference</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Index</th>
+                        <th>Target Name</th>
+                        <th>Challenge ID</th>
+                        <th>Scenario</th>
+                        <th>Icon</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="color: #ff0040; font-weight: bold;">0</td>
+                        <td>Ransomware</td>
+                        <td>chal_1</td>
+                        <td>ransomware</td>
+                        <td>🔒</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #ffaa00; font-weight: bold;">1</td>
+                        <td>Phishing</td>
+                        <td>chal_2</td>
+                        <td>phishing</td>
+                        <td>🎣</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #aa00ff; font-weight: bold;">2</td>
+                        <td>APT</td>
+                        <td>chal_3</td>
+                        <td>apt</td>
+                        <td>🕵️</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #00aaff; font-weight: bold;">3</td>
+                        <td>DDoS</td>
+                        <td>chal_4</td>
+                        <td>ddos</td>
+                        <td>🌐</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #00ff41; font-weight: bold;">4</td>
+                        <td>Supply Chain</td>
+                        <td>chal_5</td>
+                        <td>supplychain</td>
+                        <td>📦</td>
+                    </tr>
+                    <tr>
+                        <td style="color: #ff6600; font-weight: bold;">5</td>
+                        <td>InfoStealer</td>
+                        <td>chal_6</td>
+                        <td>infostealer</td>
+                        <td>💾</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
-        async function checkTarget() {
-            const status = document.getElementById('status');
-            status.innerHTML = '<span class="info">Checking...</span>';
+        // Target configurations - MUST match the order in targets.mind
+        const targets = [
+            { name: 'ransomware', title: 'RANSOMWARE', icon: '🔒' },
+            { name: 'phishing', title: 'PHISHING', icon: '🎣' },
+            { name: 'apt', title: 'APT', icon: '🕵️' },
+            { name: 'ddos', title: 'DDoS', icon: '🌐' },
+            { name: 'supplychain', title: 'SUPPLY CHAIN', icon: '📦' },
+            { name: 'infostealer', title: 'INFO STEALER', icon: '💾' }
+        ];
+
+        function generateTarget(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const ctx = canvas.getContext('2d');
+            const size = 400;
+
+            // WHITE background for high contrast
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, size, size);
+
+            // Draw thick black border
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 12;
+            ctx.strokeRect(15, 15, size - 30, size - 30);
+
+            // Draw inner border
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(35, 35, size - 70, size - 70);
+
+            // Draw unique high-contrast pattern for each target
+            drawHighContrastPattern(ctx, size, index);
+
+            // Draw corner markers (for AR tracking)
+            drawCornerMarkers(ctx, size);
+
+            // Draw target number at bottom
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#000000';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(`TARGET ${index}`, size / 2, size - 50);
+        }
+
+        function drawHighContrastPattern(ctx, size, index) {
+            const centerX = size / 2;
+            const centerY = size / 2 - 20;
             
-            try {
-                const response = await fetch('./assets/targets/targets.mind');
-                if (response.ok) {
-                    const blob = await response.blob();
-                    status.innerHTML = `<span class="success">✅ targets.mind exists! Size: ${(blob.size / 1024).toFixed(2)} KB</span>`;
-                } else {
-                    status.innerHTML = `<span class="error">❌ targets.mind not found (HTTP ${response.status})</span>`;
-                }
-            } catch (e) {
-                status.innerHTML = `<span class="error">❌ Error: ${e.message}</span>`;
+            ctx.fillStyle = '#000000';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 6;
+
+            switch (index) {
+                case 0: // Ransomware - Lock
+                    // Lock body
+                    ctx.fillRect(centerX - 40, centerY - 10, 80, 60);
+                    // Lock shackle
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY - 10, 35, Math.PI, 0);
+                    ctx.lineWidth = 12;
+                    ctx.stroke();
+                    // Keyhole
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY + 15, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(centerX - 4, centerY + 15, 8, 20);
+                    break;
+
+                case 1: // Phishing - Hook
+                    // Hook shape
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 50, 0, Math.PI * 1.3);
+                    ctx.stroke();
+                    // Hook point
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + 50, centerY);
+                    ctx.lineTo(centerX + 70, centerY - 20);
+                    ctx.lineTo(centerX + 55, centerY + 10);
+                    ctx.fill();
+                    break;
+
+                case 2: // APT - Eye/Target
+                    // Outer circle
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Middle circle
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 40, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Inner circle (pupil)
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Cross lines
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - 80, centerY);
+                    ctx.lineTo(centerX + 80, centerY);
+                    ctx.moveTo(centerX, centerY - 80);
+                    ctx.lineTo(centerX, centerY + 80);
+                    ctx.stroke();
+                    break;
+
+                case 3: // DDoS - Network/Grid
+                    // Draw grid of circles
+                    const spacing = 50;
+                    const startX = centerX - spacing;
+                    const startY = centerY - spacing;
+                    ctx.lineWidth = 6;
+                    
+                    // Draw 3x3 grid of circles
+                    for (let row = 0; row < 3; row++) {
+                        for (let col = 0; col < 3; col++) {
+                            const x = startX + col * spacing;
+                            const y = startY + row * spacing;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 15, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+                    
+                    // Connect circles with lines
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    // Horizontal lines
+                    for (let row = 0; row < 3; row++) {
+                        ctx.moveTo(startX, startY + row * spacing);
+                        ctx.lineTo(startX + 2 * spacing, startY + row * spacing);
+                    }
+                    // Vertical lines
+                    for (let col = 0; col < 3; col++) {
+                        ctx.moveTo(startX + col * spacing, startY);
+                        ctx.lineTo(startX + col * spacing, startY + 2 * spacing);
+                    }
+                    ctx.stroke();
+                    break;
+
+                case 4: // Supply Chain - Chain links
+                    ctx.lineWidth = 8;
+                    // Link 1
+                    ctx.beginPath();
+                    ctx.arc(centerX - 35, centerY, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Link 2
+                    ctx.beginPath();
+                    ctx.arc(centerX + 35, centerY, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Connection line
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - 5, centerY);
+                    ctx.lineTo(centerX + 5, centerY);
+                    ctx.stroke();
+                    break;
+
+                case 5: // InfoStealer - Key
+                    // Key head (circle)
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(centerX - 30, centerY, 35, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Key hole
+                    ctx.fillStyle = '#000000';
+                    ctx.beginPath();
+                    ctx.arc(centerX - 30, centerY, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Key shaft
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(centerX - 30, centerY - 10, 80, 20);
+                    // Key teeth
+                    ctx.fillRect(centerX + 30, centerY - 10, 15, 20);
+                    ctx.fillRect(centerX + 35, centerY + 5, 10, 15);
+                    break;
             }
         }
-        
-        // Auto-check on load
-        checkTarget();
+
+        function drawCornerMarkers(ctx, size) {
+            const markerSize = 40;
+            const offset = 25;
+
+            ctx.fillStyle = '#000000';
+
+            // Top-left L shape
+            ctx.fillRect(offset, offset, markerSize, 8);
+            ctx.fillRect(offset, offset, 8, markerSize);
+
+            // Top-right L shape
+            ctx.fillRect(size - offset - markerSize, offset, markerSize, 8);
+            ctx.fillRect(size - offset - 8, offset, 8, markerSize);
+
+            // Bottom-left L shape
+            ctx.fillRect(offset, size - offset - 8, markerSize, 8);
+            ctx.fillRect(offset, size - offset - markerSize, 8, markerSize);
+
+            // Bottom-right L shape
+            ctx.fillRect(size - offset - markerSize, size - offset - 8, markerSize, 8);
+            ctx.fillRect(size - offset - 8, size - offset - markerSize, 8, markerSize);
+        }
+
+        function generateAll() {
+            for (let i = 0; i < 6; i++) {
+                generateTarget(i);
+            }
+        }
+
+        function downloadTarget(index) {
+            const canvas = document.getElementById(`canvas-${index}`);
+            const link = document.createElement('a');
+            link.download = `target_${index}_${targets[index].name}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadAll() {
+            for (let i = 0; i < 6; i++) {
+                setTimeout(() => downloadTarget(i), i * 1000);
+            }
+        }
+
+        // Generate on page load
+        window.onload = generateAll;
     </script>
 </body>
 </html>
