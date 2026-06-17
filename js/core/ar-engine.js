@@ -144,38 +144,179 @@ class AREngine {
         }
     }
 
-    playSound(type) {
+    playSound(type, challengeId = null) {
         if (!this.audioContext) return;
 
+        // Ghost/Mystic themed sounds with different variations per challenge
+        const challengeSounds = {
+            // Ransomware - Dark/Evil ghost
+            chal_1: { baseFreq: 150, harmonics: [0.5, 1, 2], wave: 'sawtooth', reverb: 0.8 },
+            // Phishing - Sneaky/Slippery ghost
+            chal_2: { baseFreq: 200, harmonics: [1, 1.5, 3], wave: 'triangle', reverb: 0.6 },
+            // APT - Ancient/Powerful ghost
+            chal_3: { baseFreq: 100, harmonics: [1, 2, 4], wave: 'sawtooth', reverb: 0.9 },
+            // DDoS - Chaotic/Angry ghost
+            chal_4: { baseFreq: 80, harmonics: [1, 2.5, 5], wave: 'square', reverb: 0.7 },
+            // Supply Chain - Deceptive/Charming ghost
+            chal_5: { baseFreq: 250, harmonics: [1, 1.2, 2.4], wave: 'sine', reverb: 0.5 },
+            // Info Stealer - Quick/Silent ghost
+            chal_6: { baseFreq: 300, harmonics: [1, 2, 3], wave: 'triangle', reverb: 0.4 }
+        };
+
+        const challenge = challengeId ? challengeSounds[challengeId] : null;
+
         const sounds = {
-            ghostAppear: { freq: 440, type: 'sine', duration: 0.5, slide: 880 },
-            countdown: { freq: 800, type: 'sine', duration: 0.1 },
-            quizStart: { freq: 600, type: 'triangle', duration: 0.3 },
-            correct: { freq: 880, type: 'sine', duration: 0.2 },
-            wrong: { freq: 220, type: 'sawtooth', duration: 0.3 }
+            // Ghostly appearance - ethereal whoosh with reverb
+            ghostAppear: { 
+                freq: challenge ? challenge.baseFreq : 180, 
+                type: challenge ? challenge.wave : 'sine', 
+                duration: 1.2, 
+                slide: challenge ? challenge.baseFreq * 2 : 360,
+                reverb: challenge ? challenge.reverb : 0.7,
+                harmonics: challenge ? challenge.harmonics : [1, 2, 3]
+            },
+            // Countdown - mystical ticking
+            countdown: { 
+                freq: 600, 
+                type: 'sine', 
+                duration: 0.15,
+                reverb: 0.3,
+                echo: true
+            },
+            // Quiz start - magical chime
+            quizStart: { 
+                freq: 440, 
+                type: 'triangle', 
+                duration: 0.8,
+                slide: 880,
+                reverb: 0.6,
+                harmonics: [1, 2, 4]
+            },
+            // Correct answer - heavenly bell
+            correct: { 
+                freq: 880, 
+                type: 'sine', 
+                duration: 0.6,
+                slide: 1320,
+                reverb: 0.5,
+                harmonics: [1, 1.5, 2]
+            },
+            // Wrong answer - dark dissonance
+            wrong: { 
+                freq: 150, 
+                type: 'sawtooth', 
+                duration: 0.5,
+                slide: 100,
+                reverb: 0.8,
+                dissonance: true
+            },
+            // Results - triumphant ghostly chorus
+            results: {
+                freq: 523, // C5
+                type: 'triangle',
+                duration: 1.5,
+                slide: 1046, // C6
+                reverb: 0.9,
+                harmonics: [1, 2, 3, 4],
+                chorus: true
+            }
         };
 
         const sound = sounds[type];
         if (!sound) return;
 
-        const oscillator = this.audioContext.createOscillator();
-        const gainNode = this.audioContext.createGain();
+        // Create master gain for volume control
+        const masterGain = this.audioContext.createGain();
+        masterGain.gain.value = 0.4;
+        masterGain.connect(this.audioContext.destination);
 
-        oscillator.connect(gainNode);
-        gainNode.connect(this.audioContext.destination);
-
-        oscillator.frequency.value = sound.freq;
-        oscillator.type = sound.type;
-
-        gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + sound.duration);
-
-        if (sound.slide) {
-            oscillator.frequency.exponentialRampToValueAtTime(sound.slide, this.audioContext.currentTime + sound.duration);
+        // Add reverb effect
+        if (sound.reverb && sound.reverb > 0) {
+            const convolver = this.audioContext.createConvolver();
+            const reverbGain = this.audioContext.createGain();
+            reverbGain.gain.value = sound.reverb * 0.5;
+            
+            // Create impulse response for reverb
+            const rate = this.audioContext.sampleRate;
+            const length = rate * 2; // 2 seconds
+            const impulse = this.audioContext.createBuffer(2, length, rate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+            
+            for (let i = 0; i < length; i++) {
+                const decay = Math.pow(1 - i / length, 2);
+                left[i] = (Math.random() * 2 - 1) * decay;
+                right[i] = (Math.random() * 2 - 1) * decay;
+            }
+            
+            convolver.buffer = impulse;
+            convolver.connect(reverbGain);
+            reverbGain.connect(masterGain);
+            this.reverbNode = convolver;
         }
 
-        oscillator.start(this.audioContext.currentTime);
-        oscillator.stop(this.audioContext.currentTime + sound.duration);
+        // Play main tone with harmonics for richer sound
+        const playTone = (freq, type, duration, delay = 0, gain = 0.3) => {
+            const osc = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(masterGain);
+            
+            if (this.reverbNode) {
+                gainNode.connect(this.reverbNode);
+            }
+            
+            osc.frequency.value = freq;
+            osc.type = type;
+            
+            const now = this.audioContext.currentTime + delay;
+            gainNode.gain.setValueAtTime(0, now);
+            gainNode.gain.linearRampToValueAtTime(gain, now + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration);
+            
+            if (sound.slide) {
+                osc.frequency.exponentialRampToValueAtTime(sound.slide, now + duration);
+            }
+            
+            osc.start(now);
+            osc.stop(now + duration);
+        };
+
+        // Play fundamental frequency
+        playTone(sound.freq, sound.type, sound.duration, 0, 0.3);
+
+        // Add harmonics for richer ghostly texture
+        if (sound.harmonics) {
+            sound.harmonics.forEach((harmonic, i) => {
+                const harmonicFreq = sound.freq * harmonic;
+                const harmonicGain = 0.15 / (i + 1);
+                playTone(harmonicFreq, 'sine', sound.duration * 0.8, i * 0.02, harmonicGain);
+            });
+        }
+
+        // Add dissonance for wrong answer
+        if (sound.dissonance) {
+            playTone(sound.freq * 1.5, 'sawtooth', sound.duration, 0.05, 0.2);
+            playTone(sound.freq * 0.8, 'square', sound.duration, 0.1, 0.15);
+        }
+
+        // Add echo effect for countdown
+        if (sound.echo) {
+            setTimeout(() => {
+                playTone(sound.freq * 0.5, 'sine', sound.duration * 0.5, 0, 0.15);
+            }, 80);
+        }
+
+        // Add chorus effect for results
+        if (sound.chorus) {
+            setTimeout(() => {
+                playTone(sound.freq * 1.25, 'triangle', sound.duration * 0.7, 0, 0.2); // Major third
+            }, 100);
+            setTimeout(() => {
+                playTone(sound.freq * 1.5, 'sine', sound.duration * 0.6, 0, 0.15); // Perfect fifth
+            }, 200);
+        }
     }
 
     setupEventListeners() {

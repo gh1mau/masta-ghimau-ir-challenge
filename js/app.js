@@ -366,9 +366,9 @@ class IRChallengeApp {
         // Clear any existing intervals first
         this.clearAllIntervals();
 
-        // Play sound
+        // Play sound with challenge-specific ghost sound
         if (this.arEngine) {
-            this.arEngine.playSound('ghostAppear');
+            this.arEngine.playSound('ghostAppear', this.challengeId);
         }
 
         // Wait 5 seconds then show challenge info (no countdown display)
@@ -582,6 +582,11 @@ class IRChallengeApp {
     }
 
     showCompletion() {
+        // Play results sound - triumphant ghostly chorus
+        if (this.arEngine) {
+            this.arEngine.playSound('results');
+        }
+
         // Get final ranking from leaderboard
         let finalRank = null;
         if (this.firebaseInitialized && leaderboardManager.playerId) {

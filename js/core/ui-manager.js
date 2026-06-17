@@ -179,18 +179,20 @@ class UIManager {
                     flex: 1;
                 "></div>
 
-                <!-- Explanation Container (hidden by default) - COMPACT -->
+                <!-- Explanation Container (hidden by default) - ENHANCED FOR MOBILE -->
                 <div id="explanation-container" style="
                     display: none;
-                    margin-top: 15px;
-                    padding: 15px;
-                    background: rgba(0, 255, 65, 0.1);
-                    border: 1px solid rgba(0, 255, 65, 0.3);
-                    border-radius: 10px;
+                    margin-top: 20px;
+                    padding: 20px;
+                    background: rgba(0, 255, 65, 0.15);
+                    border: 2px solid rgba(0, 255, 65, 0.5);
+                    border-radius: 16px;
                     flex-shrink: 0;
+                    box-shadow: 0 4px 20px rgba(0, 255, 65, 0.2);
+                    min-height: 100px;
                 ">
-                    <div style="color: #00ff41; font-size: 13px; font-weight: 600; margin-bottom: 6px;">✓ Correct Answer</div>
-                    <div id="explanation-text" style="color: #ffffff; font-size: 14px; line-height: 1.5;"></div>
+                    <div id="explanation-title" style="color: #00ff41; font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 10px;">✓ Correct Answer</div>
+                    <div id="explanation-text" style="color: #ffffff; font-size: 16px; line-height: 1.7; font-weight: 400;"></div>
                 </div>
             </div>
         `;
@@ -290,8 +292,9 @@ class UIManager {
             return;
         }
 
-        // Get explanation container
+        // Get explanation container elements
         const explanationContainer = document.getElementById('explanation-container');
+        const explanationTitle = document.getElementById('explanation-title');
         const explanationText = document.getElementById('explanation-text');
 
         if (selectedIndex === correctIndex) {
@@ -304,14 +307,16 @@ class UIManager {
             // Update explanation container for correct answer
             if (explanationContainer) {
                 explanationContainer.style.display = 'block';
-                explanationContainer.style.background = 'rgba(0, 255, 65, 0.1)';
-                explanationContainer.style.borderColor = 'rgba(0, 255, 65, 0.4)';
-                explanationContainer.innerHTML = `
-                    <div style="color: #00ff41; font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 20px;">✓</span> Correct Answer!
-                    </div>
-                    <div style="color: #ffffff; font-size: 15px; line-height: 1.7;">${explanation || 'Well done! You selected the correct answer.'}</div>
-                `;
+                explanationContainer.style.background = 'rgba(0, 255, 65, 0.15)';
+                explanationContainer.style.borderColor = 'rgba(0, 255, 65, 0.5)';
+                explanationContainer.style.boxShadow = '0 4px 20px rgba(0, 255, 65, 0.2)';
+            }
+            if (explanationTitle) {
+                explanationTitle.innerHTML = '<span style="font-size: 22px;">✓</span> Correct Answer!';
+                explanationTitle.style.color = '#00ff41';
+            }
+            if (explanationText) {
+                explanationText.textContent = explanation || 'Well done! You selected the correct answer.';
             }
         } else {
             // Wrong answer styling
@@ -331,14 +336,16 @@ class UIManager {
             // Update explanation container for wrong answer
             if (explanationContainer) {
                 explanationContainer.style.display = 'block';
-                explanationContainer.style.background = 'rgba(255, 0, 64, 0.1)';
-                explanationContainer.style.borderColor = 'rgba(255, 0, 64, 0.4)';
-                explanationContainer.innerHTML = `
-                    <div style="color: #ff0040; font-size: 16px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 20px;">✗</span> Incorrect Answer
-                    </div>
-                    <div style="color: #ffffff; font-size: 15px; line-height: 1.7;">${explanation || 'The correct answer is highlighted in green.'}</div>
-                `;
+                explanationContainer.style.background = 'rgba(255, 0, 64, 0.15)';
+                explanationContainer.style.borderColor = 'rgba(255, 0, 64, 0.5)';
+                explanationContainer.style.boxShadow = '0 4px 20px rgba(255, 0, 64, 0.2)';
+            }
+            if (explanationTitle) {
+                explanationTitle.innerHTML = '<span style="font-size: 22px;">✗</span> Incorrect Answer';
+                explanationTitle.style.color = '#ff0040';
+            }
+            if (explanationText) {
+                explanationText.textContent = explanation || 'The correct answer is highlighted in green.';
             }
         }
 
