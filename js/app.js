@@ -371,10 +371,10 @@ class IRChallengeApp {
             this.arEngine.playSound('ghostAppear', this.challengeId);
         }
 
-        // Wait 5 seconds then show challenge info (no countdown display)
+        // Wait 10 seconds for AR model animation, then show challenge info
         setTimeout(() => {
             this.showChallengeInfoBox();
-        }, 5000);
+        }, 10000);
     }
 
     showChallengeInfoBox() {

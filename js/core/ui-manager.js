@@ -203,8 +203,9 @@ class UIManager {
                 `;
 
                 // Hover effect via JS since we're setting inline styles
+                // Only apply hover if button hasn't been answered yet
                 btn.onmouseenter = () => {
-                    if (!btn.disabled) {
+                    if (!btn.disabled && !btn.classList.contains('answered')) {
                         btn.style.background = 'rgba(0, 255, 255, 0.1)';
                         btn.style.borderColor = 'rgba(0, 255, 255, 0.5)';
                         btn.style.transform = 'translateY(-1px)';
@@ -212,7 +213,7 @@ class UIManager {
                     }
                 };
                 btn.onmouseleave = () => {
-                    if (!btn.disabled) {
+                    if (!btn.disabled && !btn.classList.contains('answered')) {
                         btn.style.background = 'rgba(255, 255, 255, 0.03)';
                         btn.style.borderColor = 'rgba(0, 255, 255, 0.2)';
                         btn.style.transform = 'translateY(0)';

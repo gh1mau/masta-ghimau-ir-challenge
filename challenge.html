@@ -174,7 +174,8 @@
             min-height: 0;
         }
 
-        .option-btn:hover { background: rgba(0,255,255,0.2); }
+        /* Only show hover effect on non-answered buttons */
+        .option-btn:not(.answered):hover { background: rgba(0,255,255,0.2); }
         .option-btn.correct { background: #00ff88; color: #000; border-color: #00ff88; }
         .option-btn.wrong { background: #ff0040; color: #fff; border-color: #ff0040; }
 
@@ -298,9 +299,7 @@
         }
 
         .leaderboard-rank {
-            width: 30px;
-            color: #00ffff;
-            font-weight: 700;
+            display: none; /* Hide rank number */
         }
 
         .leaderboard-name {
