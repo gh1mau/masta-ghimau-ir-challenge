@@ -17,7 +17,7 @@ export const CONFIG = {
     // AR Settings
     ar: {
         targetPath: './targets.mind',
-        maxTrack: 5,  // Support up to 5 targets
+        maxTrack: 6,  // Support up to 6 targets (one for each challenge)
         uiLoading: 'no',
         uiScanning: 'no',
         uiError: 'no',
@@ -36,7 +36,7 @@ export const CONFIG = {
         'chal_3': 2,  // APT -> Target 2
         'chal_4': 3,  // DDoS -> Target 3
         'chal_5': 4,  // Supply Chain -> Target 4
-        'chal_6': 0   // InfoStealer -> Target 0 (or add more targets)
+        'chal_6': 5   // InfoStealer -> Target 5
     },
 
     // 6 Challenges Configuration

@@ -152,7 +152,7 @@
 <body>
     <div class="container">
         <h1>👻 AR Target Image Generator</h1>
-        <p class="subtitle">Generate 5 target images for Masta Ghimau IR Challenge</p>
+        <p class="subtitle">Generate 6 target images for Masta Ghimau IR Challenge</p>
 
         <div class="targets-grid">
             <!-- Target 0: Ransomware -->
@@ -194,6 +194,14 @@
                 <canvas id="canvas-4" class="target-canvas" width="400" height="400"></canvas>
                 <button class="download-btn" onclick="downloadTarget(4)">Download</button>
             </div>
+
+            <!-- Target 5: InfoStealer -->
+            <div class="target-card">
+                <div class="target-number">Target 5</div>
+                <div class="target-title">💾 InfoStealer</div>
+                <canvas id="canvas-5" class="target-canvas" width="400" height="400"></canvas>
+                <button class="download-btn" onclick="downloadTarget(5)">Download</button>
+            </div>
         </div>
 
         <div class="actions">
@@ -214,13 +222,14 @@
     </div>
 
     <script>
-        // Target configurations
+        // Target configurations - 6 targets for 6 challenges
         const targets = [
             { name: 'ransomware', title: 'RANSOMWARE', color: '#ff0040', icon: '🔒' },
             { name: 'phishing', title: 'PHISHING', color: '#ffaa00', icon: '🎣' },
             { name: 'apt', title: 'APT', color: '#aa00ff', icon: '🕵️' },
             { name: 'ddos', title: 'DDoS', color: '#00aaff', icon: '🌐' },
-            { name: 'supplychain', title: 'SUPPLY CHAIN', color: '#00ff41', icon: '📦' }
+            { name: 'supplychain', title: 'SUPPLY CHAIN', color: '#00ff41', icon: '📦' },
+            { name: 'infostealer', title: 'INFO STEALER', color: '#ff6600', icon: '💾' }
         ];
 
         function generateTarget(index) {
@@ -361,6 +370,9 @@
                 case 4: // Supply Chain - Chain shape
                     drawChainShape(ctx, centerX, centerY - 80, 30);
                     break;
+                case 5: // InfoStealer - Data/Key shape
+                    drawDataShape(ctx, centerX, centerY - 80, 30);
+                    break;
             }
         }
 
@@ -423,8 +435,23 @@
             ctx.stroke();
         }
 
+        function drawDataShape(ctx, x, y, size) {
+            // Draw a key/data shape for InfoStealer
+            ctx.strokeStyle = '#ff6600';
+            ctx.lineWidth = 3;
+            // Key head (circle)
+            ctx.beginPath();
+            ctx.arc(x, y, size/2, 0, Math.PI * 2);
+            ctx.stroke();
+            // Key shaft
+            ctx.fillRect(x - size/6, y + size/2, size/3, size);
+            // Key teeth
+            ctx.fillRect(x - size/6, y + size/2 + size, size/2, size/4);
+            ctx.fillRect(x - size/6, y + size/2 + size + size/3, size/3, size/4);
+        }
+
         function generateAll() {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 generateTarget(i);
             }
         }
@@ -438,7 +465,7 @@
         }
 
         function downloadAll() {
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < 6; i++) {
                 setTimeout(() => downloadTarget(i), i * 500);
             }
         }
