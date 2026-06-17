@@ -277,60 +277,26 @@ class UIManager {
             return;
         }
 
-        // Get explanation container elements
-        const explanationContainer = document.getElementById('explanation-container');
-        const explanationTitle = document.getElementById('explanation-title');
-        const explanationText = document.getElementById('explanation-text');
-
         if (selectedIndex === correctIndex) {
-            // Correct answer styling
+            // Correct answer styling - GREEN
             selectedBtn.classList.add('correct');
-            selectedBtn.style.background = 'rgba(0, 255, 65, 0.25)';
+            selectedBtn.style.background = 'rgba(0, 255, 65, 0.35)';
             selectedBtn.style.borderColor = '#00ff41';
-            selectedBtn.style.boxShadow = '0 0 20px rgba(0, 255, 65, 0.3)';
-            
-            // Update explanation container for correct answer
-            if (explanationContainer) {
-                explanationContainer.style.display = 'block';
-                explanationContainer.style.background = 'rgba(0, 255, 65, 0.15)';
-                explanationContainer.style.borderColor = 'rgba(0, 255, 65, 0.5)';
-                explanationContainer.style.boxShadow = '0 4px 20px rgba(0, 255, 65, 0.2)';
-            }
-            if (explanationTitle) {
-                explanationTitle.innerHTML = '<span style="font-size: 22px;">✓</span> Correct Answer!';
-                explanationTitle.style.color = '#00ff41';
-            }
-            if (explanationText) {
-                explanationText.textContent = explanation || 'Well done! You selected the correct answer.';
-            }
+            selectedBtn.style.boxShadow = '0 0 30px rgba(0, 255, 65, 0.5)';
         } else {
-            // Wrong answer styling
+            // Wrong answer styling - RED
             selectedBtn.classList.add('wrong');
-            selectedBtn.style.background = 'rgba(255, 0, 64, 0.25)';
+            selectedBtn.style.background = 'rgba(255, 0, 64, 0.35)';
             selectedBtn.style.borderColor = '#ff0040';
-            selectedBtn.style.boxShadow = '0 0 20px rgba(255, 0, 64, 0.3)';
+            selectedBtn.style.boxShadow = '0 0 30px rgba(255, 0, 64, 0.5)';
             
-            // Highlight correct answer
+            // Highlight correct answer - GREEN
             const correctBtn = allBtns[correctIndex];
             if (correctBtn) {
                 correctBtn.classList.add('correct');
-                correctBtn.style.background = 'rgba(0, 255, 65, 0.15)';
-                correctBtn.style.borderColor = 'rgba(0, 255, 65, 0.5)';
-            }
-            
-            // Update explanation container for wrong answer
-            if (explanationContainer) {
-                explanationContainer.style.display = 'block';
-                explanationContainer.style.background = 'rgba(255, 0, 64, 0.15)';
-                explanationContainer.style.borderColor = 'rgba(255, 0, 64, 0.5)';
-                explanationContainer.style.boxShadow = '0 4px 20px rgba(255, 0, 64, 0.2)';
-            }
-            if (explanationTitle) {
-                explanationTitle.innerHTML = '<span style="font-size: 22px;">✗</span> Incorrect Answer';
-                explanationTitle.style.color = '#ff0040';
-            }
-            if (explanationText) {
-                explanationText.textContent = explanation || 'The correct answer is highlighted in green.';
+                correctBtn.style.background = 'rgba(0, 255, 65, 0.25)';
+                correctBtn.style.borderColor = '#00ff41';
+                correctBtn.style.boxShadow = '0 0 20px rgba(0, 255, 65, 0.4)';
             }
         }
 
@@ -343,7 +309,7 @@ class UIManager {
             
             // Dim other buttons that weren't selected
             if (idx !== selectedIndex && idx !== correctIndex) {
-                btn.style.opacity = '0.4';
+                btn.style.opacity = '0.3';
                 btn.style.transform = 'scale(0.98)';
             }
         });
