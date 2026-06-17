@@ -557,11 +557,32 @@ class AREngine {
             this.isRunning = true;
             await this.mindarThree.start();
             this.startRenderLoop();
+            
+            // Add resize handler with protection
+            this.setupResizeHandler();
+            
             logger.ar('AR session started');
         } catch (error) {
             logger.error('Failed to start AR session', { error: error.message });
             this.isRunning = false;
         }
+    }
+
+    setupResizeHandler() {
+        // Override MindAR's resize to add safety checks
+        const originalResize = this.mindarThree.resize;
+        this.mindarThree.resize = () => {
+            try {
+                // Check if controller is ready before resizing
+                if (this.mindarThree.controller && this.mindarThree.renderer) {
+                    originalResize.call(this.mindarThree);
+                } else {
+                    logger.warn('Resize called before AR controller ready, skipping');
+                }
+            } catch (error) {
+                logger.warn('Resize error (non-critical):', error.message);
+            }
+        };
     }
 
     stop() {
