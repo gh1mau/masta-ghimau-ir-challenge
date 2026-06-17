@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print AR Targets - Masta Ghimau IR Challenge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .print-container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            padding: 15mm;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #1a1a2e;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .targets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15mm;
+            margin-bottom: 15px;
+        }
+
+        .target-card {
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            background: #fafafa;
+            page-break-inside: avoid;
+        }
+
+        .target-header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #00ff41;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .target-number {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .target-title {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .target-image {
+            width: 100%;
+            max-width: 70mm;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 10px auto;
+            display: block;
+        }
+
+        .target-info {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .challenge-id {
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a1a2e;
+            background: #00ff41;
+            padding: 3px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 2px solid #1a1a2e;
+            font-size: 10px;
+            color: #666;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #00ff41, #00cc33);
+            color: #000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
+            transition: transform 0.2s;
+        }
+
+        .print-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .print-container {
+                box-shadow: none;
+                padding: 10mm;
+            }
+
+            .print-btn {
+                display: none;
+            }
+
+            .target-card {
+                break-inside: avoid;
+            }
+        }
+
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+    </style>
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print Targets</button>
+
+    <div class="print-container">
+        <div class="header">
+            <h1>👻 Masta Ghimau IR Challenge</h1>
+            <p>AR Target Markers - Print on A4 Paper</p>
+        </div>
+
+        <div class="targets-grid">
+            <!-- Target 0: Ransomware -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 0</div>
+                    <div class="target-title">🔒 RANSOMWARE</div>
+                </div>
+                <img src="assets/targets/target_0_ransomware.png" alt="Ransomware Target" class="target-image">
+                <div class="target-info">Scan this marker to start Ransomware Challenge</div>
+                <div class="challenge-id">Challenge: chal_1</div>
+            </div>
+
+            <!-- Target 1: Phishing -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 1</div>
+                    <div class="target-title">🎣 PHISHING</div>
+                </div>
+                <img src="assets/targets/target_1_phishing.png" alt="Phishing Target" class="target-image">
+                <div class="target-info">Scan this marker to start Phishing Challenge</div>
+                <div class="challenge-id">Challenge: chal_2</div>
+            </div>
+
+            <!-- Target 2: APT -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 2</div>
+                    <div class="target-title">🕵️ APT</div>
+                </div>
+                <img src="assets/targets/target_2_apt.png" alt="APT Target" class="target-image">
+                <div class="target-info">Scan this marker to start APT Challenge</div>
+                <div class="challenge-id">Challenge: chal_3</div>
+            </div>
+
+            <!-- Target 3: DDoS -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 3</div>
+                    <div class="target-title">🌐 DDoS</div>
+                </div>
+                <img src="assets/targets/target_3_ddos.png" alt="DDoS Target" class="target-image">
+                <div class="target-info">Scan this marker to start DDoS Challenge</div>
+                <div class="challenge-id">Challenge: chal_4</div>
+            </div>
+
+            <!-- Target 4: Supply Chain -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 4</div>
+                    <div class="target-title">📦 SUPPLY CHAIN</div>
+                </div>
+                <img src="assets/targets/target_4_supplychain.png" alt="Supply Chain Target" class="target-image">
+                <div class="target-info">Scan this marker to start Supply Chain Challenge</div>
+                <div class="challenge-id">Challenge: chal_5</div>
+            </div>
+
+            <!-- Target 5: InfoStealer -->
+            <div class="target-card">
+                <div class="target-header">
+                    <div class="target-number">TARGET 5</div>
+                    <div class="target-title">💾 INFO STEALER</div>
+                </div>
+                <img src="assets/targets/target_5_infostealer.png" alt="InfoStealer Target" class="target-image">
+                <div class="target-info">Scan this marker to start InfoStealer Challenge</div>
+                <div class="challenge-id">Challenge: chal_6</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>Masta Ghimau IR Challenge</strong> | Developed by Hussein Mohamed masta ghimau</p>
+            <p>YouTube: @mastaghimau | GitHub: gh1mau</p>
+            <p style="margin-top: 5px; font-size: 9px;">Print these markers on A4 paper. Ensure good lighting when scanning.</p>
+        </div>
+    </div>
+</body>
+</html>
