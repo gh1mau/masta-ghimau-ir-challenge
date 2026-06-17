@@ -410,19 +410,24 @@ class AREngine {
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
 
-        // Center the model
-        model.position.sub(center);
+        // Center the model - position at exact center of screen
+        model.position.x = -center.x;
+        model.position.y = -center.y + 0.2; // Slight offset up for better visibility
+        model.position.z = -center.z;
 
-        // Calculate scale to fit nicely on phone screen
+        // Calculate scale to fit nicely on phone screen - LARGER for better visibility
         const maxDim = Math.max(size.x, size.y, size.z);
-        const targetSize = 1.5; // Target size in world units
+        const targetSize = 2.0; // Increased from 1.5 for better visibility
         const scale = targetSize / maxDim;
 
         // Apply scale (clamped to reasonable range)
-        const finalScale = Math.min(scale, 2.0); // Max scale 2x
+        const finalScale = Math.min(scale, 2.5); // Max scale 2.5x
         model.scale.setScalar(finalScale);
 
-        logger.info('Model centered and scaled', { scale: finalScale, size: maxDim });
+        // Ensure model faces camera
+        model.rotation.set(0, 0, 0);
+
+        logger.info('Model centered and scaled', { scale: finalScale, size: maxDim, position: model.position });
     }
 
     loadGLBModel(url) {

@@ -21,7 +21,10 @@ class Validator {
             'phishing',
             'insider-threat',
             'apt',
-            'malware-analysis'
+            'malware-analysis',
+            'supply',           // Supply Chain Attack
+            'ddos',             // DDoS & Defacement
+            'infostealer'       // InfoStealer Outbreak
         ]);
 
         // Whitelist of valid object types

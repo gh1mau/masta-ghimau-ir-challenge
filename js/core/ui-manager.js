@@ -319,8 +319,16 @@ class UIManager {
         let rankDisplay = '';
         if (rank) {
             const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '🏅';
+            const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : '#00ffff';
             rankDisplay = `
-                <div style="font-size: 36px; margin: 15px 0;">
+                <div style="
+                    font-size: 42px; 
+                    margin: 20px 0;
+                    color: ${rankColor};
+                    font-weight: 800;
+                    text-shadow: 0 0 20px ${rankColor}80;
+                    letter-spacing: 2px;
+                ">
                     ${rankEmoji} Rank #${rank}
                 </div>
             `;
@@ -328,10 +336,10 @@ class UIManager {
 
         this.elements.questionPanel.innerHTML = `
             <div style="text-align: center; padding: 40px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">🏆</div>
-                <h2 style="color: #00ffff; margin-bottom: 20px; font-size: 32px;">Challenge Complete!</h2>
+                <div style="font-size: 72px; margin-bottom: 20px; filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));">🏆</div>
+                <h2 style="color: #00ffff; margin-bottom: 20px; font-size: 36px; font-weight: 800; text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);">Challenge Complete!</h2>
                 ${rankDisplay}
-                <p style="color: #00ff41; font-size: 24px; margin-bottom: 10px; font-weight: bold;">
+                <p style="color: #00ff41; font-size: 28px; margin-bottom: 10px; font-weight: 800; text-shadow: 0 0 15px rgba(0, 255, 65, 0.5);">
                     ${score} points
                 </p>
                 <p style="color: #888; font-size: 14px; margin-top: 30px;">
