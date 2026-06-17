@@ -77,6 +77,7 @@
             border-radius: 10px;
             margin: 10px 0;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            background: #fff;
         }
 
         .download-btn {
@@ -147,12 +148,30 @@
         .hidden {
             display: none;
         }
+
+        .tips {
+            background: rgba(255, 255, 0, 0.1);
+            border-left: 4px solid #ffcc00;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .tips h3 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+        }
+
+        .tips ul {
+            margin-left: 20px;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>👻 AR Target Image Generator</h1>
-        <p class="subtitle">Generate 6 target images for Masta Ghimau IR Challenge</p>
+        <p class="subtitle">Generate 6 HIGH CONTRAST target images for Masta Ghimau IR Challenge</p>
 
         <div class="targets-grid">
             <!-- Target 0: Ransomware -->
@@ -209,13 +228,25 @@
             <button class="generate-all-btn" onclick="downloadAll()">💾 Download All</button>
         </div>
 
+        <div class="tips">
+            <h3>💡 Tips for Better AR Tracking:</h3>
+            <ul>
+                <li><strong>High Contrast:</strong> Black patterns on white background</li>
+                <li><strong>Unique Patterns:</strong> Each target has distinct geometric shapes</li>
+                <li><strong>Clear Borders:</strong> Thick black borders for easy detection</li>
+                <li><strong>Print Quality:</strong> Use high-quality color printing</li>
+                <li><strong>Lighting:</strong> Ensure good lighting when scanning</li>
+                <li><strong>Distance:</strong> Hold phone 15-30cm from target</li>
+            </ul>
+        </div>
+
         <div class="instructions">
             <h3>📋 Next Steps:</h3>
             <ol>
                 <li>Click "Generate All Targets" to create the images</li>
-                <li>Click "Download All" to save all 5 images</li>
+                <li>Click "Download All" to save all 6 images</li>
                 <li>Go to <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile/" target="_blank" style="color: #00ff41;">MindAR Compiler</a></li>
-                <li>Upload all 5 images and compile into <code>targets.mind</code></li>
+                <li>Upload all 6 images and compile into <code>targets.mind</code></li>
                 <li>Place <code>targets.mind</code> in your project root folder</li>
             </ol>
         </div>
@@ -224,230 +255,205 @@
     <script>
         // Target configurations - 6 targets for 6 challenges
         const targets = [
-            { name: 'ransomware', title: 'RANSOMWARE', color: '#ff0040', icon: '🔒' },
-            { name: 'phishing', title: 'PHISHING', color: '#ffaa00', icon: '🎣' },
-            { name: 'apt', title: 'APT', color: '#aa00ff', icon: '🕵️' },
-            { name: 'ddos', title: 'DDoS', color: '#00aaff', icon: '🌐' },
-            { name: 'supplychain', title: 'SUPPLY CHAIN', color: '#00ff41', icon: '📦' },
-            { name: 'infostealer', title: 'INFO STEALER', color: '#ff6600', icon: '💾' }
+            { name: 'ransomware', title: 'RANSOMWARE', icon: '🔒' },
+            { name: 'phishing', title: 'PHISHING', icon: '🎣' },
+            { name: 'apt', title: 'APT', icon: '🕵️' },
+            { name: 'ddos', title: 'DDoS', icon: '🌐' },
+            { name: 'supplychain', title: 'SUPPLY CHAIN', icon: '📦' },
+            { name: 'infostealer', title: 'INFO STEALER', icon: '💾' }
         ];
 
         function generateTarget(index) {
             const canvas = document.getElementById(`canvas-${index}`);
             const ctx = canvas.getContext('2d');
-            const target = targets[index];
             const size = 400;
 
-            // Clear canvas
-            ctx.fillStyle = '#1a1a2e';
+            // WHITE background for high contrast
+            ctx.fillStyle = '#FFFFFF';
             ctx.fillRect(0, 0, size, size);
 
-            // Draw background pattern
-            drawPattern(ctx, size, target.color);
-
-            // Draw border
-            ctx.strokeStyle = target.color;
-            ctx.lineWidth = 8;
-            ctx.strokeRect(20, 20, size - 40, size - 40);
+            // Draw thick black border
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 12;
+            ctx.strokeRect(15, 15, size - 30, size - 30);
 
             // Draw inner border
-            ctx.strokeStyle = target.color;
-            ctx.lineWidth = 2;
-            ctx.setLineDash([10, 10]);
-            ctx.strokeRect(40, 40, size - 80, size - 80);
-            ctx.setLineDash([]);
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(35, 35, size - 70, size - 70);
+
+            // Draw unique high-contrast pattern for each target
+            drawHighContrastPattern(ctx, size, index);
 
             // Draw corner markers (for AR tracking)
-            drawCornerMarkers(ctx, size, target.color);
+            drawCornerMarkers(ctx, size);
 
-            // Draw icon
-            ctx.font = '80px Arial';
+            // Draw target number at bottom
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#000000';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(target.icon, size / 2, size / 2 - 30);
-
-            // Draw title
-            ctx.font = 'bold 30px Arial';
-            ctx.fillStyle = '#fff';
-            ctx.fillText(target.title, size / 2, size / 2 + 60);
-
-            // Draw target number
-            ctx.font = 'bold 20px Arial';
-            ctx.fillStyle = target.color;
-            ctx.fillText(`TARGET ${index}`, size / 2, size / 2 + 100);
-
-            // Draw decorative elements
-            drawDecorations(ctx, size, target.color, index);
+            ctx.fillText(`TARGET ${index}`, size / 2, size - 50);
         }
 
-        function drawPattern(ctx, size, color) {
-            // Draw grid pattern
-            ctx.strokeStyle = color + '20';
-            ctx.lineWidth = 1;
-
-            for (let i = 0; i < size; i += 20) {
-                ctx.beginPath();
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, size);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(0, i);
-                ctx.lineTo(size, i);
-                ctx.stroke();
-            }
-
-            // Draw random dots for feature points
-            ctx.fillStyle = color + '40';
-            for (let i = 0; i < 50; i++) {
-                const x = Math.random() * size;
-                const y = Math.random() * size;
-                const r = Math.random() * 3 + 1;
-                ctx.beginPath();
-                ctx.arc(x, y, r, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function drawCornerMarkers(ctx, size, color) {
-            const markerSize = 30;
-            const offset = 30;
-
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 4;
-
-            // Top-left
-            ctx.beginPath();
-            ctx.moveTo(offset, offset + markerSize);
-            ctx.lineTo(offset, offset);
-            ctx.lineTo(offset + markerSize, offset);
-            ctx.stroke();
-
-            // Top-right
-            ctx.beginPath();
-            ctx.moveTo(size - offset - markerSize, offset);
-            ctx.lineTo(size - offset, offset);
-            ctx.lineTo(size - offset, offset + markerSize);
-            ctx.stroke();
-
-            // Bottom-left
-            ctx.beginPath();
-            ctx.moveTo(offset, size - offset - markerSize);
-            ctx.lineTo(offset, size - offset);
-            ctx.lineTo(offset + markerSize, size - offset);
-            ctx.stroke();
-
-            // Bottom-right
-            ctx.beginPath();
-            ctx.moveTo(size - offset - markerSize, size - offset);
-            ctx.lineTo(size - offset, size - offset);
-            ctx.lineTo(size - offset, size - offset - markerSize);
-            ctx.stroke();
-        }
-
-        function drawDecorations(ctx, size, color, index) {
-            // Draw unique pattern for each target
-            ctx.strokeStyle = color + '60';
-            ctx.lineWidth = 2;
-
+        function drawHighContrastPattern(ctx, size, index) {
             const centerX = size / 2;
-            const centerY = size / 2;
+            const centerY = size / 2 - 20;
+            
+            ctx.fillStyle = '#000000';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 6;
 
-            // Draw different geometric shapes based on index
             switch (index) {
-                case 0: // Ransomware - Lock shape
-                    drawLockShape(ctx, centerX, centerY - 80, 30);
+                case 0: // Ransomware - Lock
+                    // Lock body
+                    ctx.fillRect(centerX - 40, centerY - 10, 80, 60);
+                    // Lock shackle
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY - 10, 35, Math.PI, 0);
+                    ctx.lineWidth = 12;
+                    ctx.stroke();
+                    // Keyhole
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY + 15, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillRect(centerX - 4, centerY + 15, 8, 20);
                     break;
-                case 1: // Phishing - Hook shape
-                    drawHookShape(ctx, centerX, centerY - 80, 30);
+
+                case 1: // Phishing - Hook
+                    // Hook shape
+                    ctx.lineWidth = 10;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 50, 0, Math.PI * 1.3);
+                    ctx.stroke();
+                    // Hook point
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + 50, centerY);
+                    ctx.lineTo(centerX + 70, centerY - 20);
+                    ctx.lineTo(centerX + 55, centerY + 10);
+                    ctx.fill();
                     break;
-                case 2: // APT - Spy shape
-                    drawSpyShape(ctx, centerX, centerY - 80, 30);
+
+                case 2: // APT - Eye/Target
+                    // Outer circle
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 60, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Middle circle
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 40, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Inner circle (pupil)
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Cross lines
+                    ctx.lineWidth = 4;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - 80, centerY);
+                    ctx.lineTo(centerX + 80, centerY);
+                    ctx.moveTo(centerX, centerY - 80);
+                    ctx.lineTo(centerX, centerY + 80);
+                    ctx.stroke();
                     break;
-                case 3: // DDoS - Network shape
-                    drawNetworkShape(ctx, centerX, centerY - 80, 30);
+
+                case 3: // DDoS - Network/Grid
+                    // Draw grid of circles
+                    const spacing = 50;
+                    const startX = centerX - spacing;
+                    const startY = centerY - spacing;
+                    ctx.lineWidth = 6;
+                    
+                    // Draw 3x3 grid of circles
+                    for (let row = 0; row < 3; row++) {
+                        for (let col = 0; col < 3; col++) {
+                            const x = startX + col * spacing;
+                            const y = startY + row * spacing;
+                            ctx.beginPath();
+                            ctx.arc(x, y, 15, 0, Math.PI * 2);
+                            ctx.stroke();
+                        }
+                    }
+                    
+                    // Connect circles with lines
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    // Horizontal lines
+                    for (let row = 0; row < 3; row++) {
+                        ctx.moveTo(startX, startY + row * spacing);
+                        ctx.lineTo(startX + 2 * spacing, startY + row * spacing);
+                    }
+                    // Vertical lines
+                    for (let col = 0; col < 3; col++) {
+                        ctx.moveTo(startX + col * spacing, startY);
+                        ctx.lineTo(startX + col * spacing, startY + 2 * spacing);
+                    }
+                    ctx.stroke();
                     break;
-                case 4: // Supply Chain - Chain shape
-                    drawChainShape(ctx, centerX, centerY - 80, 30);
+
+                case 4: // Supply Chain - Chain links
+                    ctx.lineWidth = 8;
+                    // Link 1
+                    ctx.beginPath();
+                    ctx.arc(centerX - 35, centerY, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Link 2
+                    ctx.beginPath();
+                    ctx.arc(centerX + 35, centerY, 30, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Connection line
+                    ctx.lineWidth = 6;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - 5, centerY);
+                    ctx.lineTo(centerX + 5, centerY);
+                    ctx.stroke();
                     break;
-                case 5: // InfoStealer - Data/Key shape
-                    drawDataShape(ctx, centerX, centerY - 80, 30);
+
+                case 5: // InfoStealer - Key
+                    // Key head (circle)
+                    ctx.lineWidth = 8;
+                    ctx.beginPath();
+                    ctx.arc(centerX - 30, centerY, 35, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // Key hole
+                    ctx.fillStyle = '#000000';
+                    ctx.beginPath();
+                    ctx.arc(centerX - 30, centerY, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    // Key shaft
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(centerX - 30, centerY - 10, 80, 20);
+                    // Key teeth
+                    ctx.fillRect(centerX + 30, centerY - 10, 15, 20);
+                    ctx.fillRect(centerX + 35, centerY + 5, 10, 15);
                     break;
             }
         }
 
-        function drawLockShape(ctx, x, y, size) {
-            ctx.strokeStyle = '#ff0040';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y - size/2, size/2, Math.PI, 0);
-            ctx.stroke();
-            ctx.strokeRect(x - size/2, y, size, size * 0.8);
-        }
+        function drawCornerMarkers(ctx, size) {
+            const markerSize = 40;
+            const offset = 25;
 
-        function drawHookShape(ctx, x, y, size) {
-            ctx.strokeStyle = '#ffaa00';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y, size/2, 0, Math.PI * 1.5);
-            ctx.lineTo(x + size/2, y - size);
-            ctx.stroke();
-        }
+            ctx.fillStyle = '#000000';
 
-        function drawSpyShape(ctx, x, y, size) {
-            ctx.strokeStyle = '#aa00ff';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x, y, size/2, 0, Math.PI * 2);
-            ctx.moveTo(x - size, y);
-            ctx.lineTo(x + size, y);
-            ctx.stroke();
-        }
+            // Top-left L shape
+            ctx.fillRect(offset, offset, markerSize, 8);
+            ctx.fillRect(offset, offset, 8, markerSize);
 
-        function drawNetworkShape(ctx, x, y, size) {
-            ctx.strokeStyle = '#00aaff';
-            ctx.lineWidth = 3;
-            const nodes = [
-                {x: x, y: y - size},
-                {x: x - size, y: y + size/2},
-                {x: x + size, y: y + size/2}
-            ];
-            ctx.beginPath();
-            nodes.forEach((node, i) => {
-                nodes.forEach((other, j) => {
-                    if (i < j) {
-                        ctx.moveTo(node.x, node.y);
-                        ctx.lineTo(other.x, other.y);
-                    }
-                });
-            });
-            ctx.stroke();
-        }
+            // Top-right L shape
+            ctx.fillRect(size - offset - markerSize, offset, markerSize, 8);
+            ctx.fillRect(size - offset - 8, offset, 8, markerSize);
 
-        function drawChainShape(ctx, x, y, size) {
-            ctx.strokeStyle = '#00ff41';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.arc(x - size/2, y, size/3, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(x + size/2, y, size/3, 0, Math.PI * 2);
-            ctx.stroke();
-        }
+            // Bottom-left L shape
+            ctx.fillRect(offset, size - offset - 8, markerSize, 8);
+            ctx.fillRect(offset, size - offset - markerSize, 8, markerSize);
 
-        function drawDataShape(ctx, x, y, size) {
-            // Draw a key/data shape for InfoStealer
-            ctx.strokeStyle = '#ff6600';
-            ctx.lineWidth = 3;
-            // Key head (circle)
-            ctx.beginPath();
-            ctx.arc(x, y, size/2, 0, Math.PI * 2);
-            ctx.stroke();
-            // Key shaft
-            ctx.fillRect(x - size/6, y + size/2, size/3, size);
-            // Key teeth
-            ctx.fillRect(x - size/6, y + size/2 + size, size/2, size/4);
-            ctx.fillRect(x - size/6, y + size/2 + size + size/3, size/3, size/4);
+            // Bottom-right L shape
+            ctx.fillRect(size - offset - markerSize, size - offset - 8, markerSize, 8);
+            ctx.fillRect(size - offset - 8, size - offset - markerSize, 8, markerSize);
         }
 
         function generateAll() {
