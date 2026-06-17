@@ -22,7 +22,7 @@ class Validator {
             'insider-threat',
             'apt',
             'malware-analysis',
-            'supply',           // Supply Chain Attack
+            'supplychain',      // Supply Chain Attack
             'ddos',             // DDoS & Defacement
             'infostealer'       // InfoStealer Outbreak
         ]);
