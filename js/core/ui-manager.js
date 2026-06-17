@@ -85,21 +85,20 @@ class UIManager {
         // Ensure question panel is visible with proper styling - FULL SCREEN
         const panel = this.elements.questionPanel;
         if (panel) {
-            panel.style.cssText = `
-                display: block !important;
-                position: fixed !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
-                z-index: 9999 !important;
-                background: linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%) !important;
-                padding: 10px !important;
-                margin: 0 !important;
-                overflow-y: auto !important;
-                box-sizing: border-box !important;
-                border: none !important;
-            `;
+            // Add active class and set inline styles
+            panel.classList.add('active');
+            panel.style.position = 'fixed';
+            panel.style.top = '0';
+            panel.style.left = '0';
+            panel.style.width = '100vw';
+            panel.style.height = '100vh';
+            panel.style.zIndex = '9999';
+            panel.style.background = 'linear-gradient(135deg, #0a0a1f 0%, #1a1a3f 100%)';
+            panel.style.padding = '10px';
+            panel.style.margin = '0';
+            panel.style.overflowY = 'auto';
+            panel.style.boxSizing = 'border-box';
+            panel.style.border = 'none';
         }
 
         // Calculate progress percentage
